@@ -30,7 +30,7 @@ from keras.callbacks import Callback, ModelCheckpoint
 import utils as ut
 import multiprocessing as mp
 import time
-from tqdm import tqdm
+#from tqdm import tqdm
 
 import variableAnalyzer as var
 
@@ -129,7 +129,8 @@ def ana(inputDir, process, outputDir, sys='', flag1=False):
     #ttbbFilter nMatchable: 5557
     countMatchable = True
     if countMatchable :
-        df = pd.read_hdf("/home/sarakm0704/WORK/ttbb/ttbbRun2/deepAna/array/array_train_ttbb.h5")
+#        df = pd.read_hdf("/home/sarakm0704/WORK/ttbb/TTBBDiff/dnn/array/array_train_ttbb.h5")
+        df = pd.read_hdf("./array/array_train_ttbb.h5")
         df = df.filter(['signal','event','dR'], axis=1)
         df = df.query('signal > 0')
         #tmpId = df.groupby(['event'])['dR'].transform(max) == df['dR']
