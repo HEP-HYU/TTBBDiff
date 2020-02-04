@@ -181,12 +181,10 @@ class roc_callback(Callback):
         ######################
         #Matching Efficiencies
         ######################
-#        test_nevt = len(self.event.drop_duplicates(subset=['event','addbjet1_pt','addbjet2_pt']))
         test_nevt = len(self.event.drop_duplicates(subset=['event']))
         df_y_pred_val = pd.DataFrame(y_pred_val[:,1]).set_index(self.event.index)
         df_y_pred_val = pd.concat([df_y_pred_val,self.event], axis=1)
         df_y_pred_val.columns = df_y_pred_val.columns.map(str)
-#        idx = df_y_pred_val.groupby(['event','addbjet1_pt','addbjet2_pt'])['0'].transform(max) == df_y_pred_val['0']
         idx = df_y_pred_val.groupby(['event'])['0'].transform(max) == df_y_pred_val['0']
         df_y_pred_val = df_y_pred_val[idx]
         test_matched = len(df_y_pred_val.loc[df_y_pred_val['signal']==1])
@@ -278,13 +276,11 @@ class roc_callback(Callback):
         return
 
 data = pd.read_hdf(trainInput)
-#data = data.reset_index(drop=True) #if there is no filtered samples..
 ##########################################
 #drop phi and label features, correlations
 ##########################################
 #col_names = list(data_train)
 labels = data.filter(['signal'], axis=1)
-#all_event = data.filter(['event','addbjet1_pt','addbjet2_pt','signal'], axis=1)
 all_event = data.filter(['event','signal'], axis=1)
 
 data = data.filter(['signal']+ut.getVarlist())
@@ -301,7 +297,6 @@ data = data.drop('signal', axis=1) #then drop label
 #split datasets
 ###############
 #print(list(all_event))
-#groupped_event = all_event.drop_duplicates(subset=['event','addbjet1_pt','addbjet2_pt'])
 groupped_event = all_event.drop_duplicates(subset=['event'])
 
 nevt = len(groupped_event)
@@ -310,7 +305,6 @@ print(len(groupped_event))
 split_nevt = groupped_event[:int(nevt*0.8)].iloc[-1]
 split_point = -1
 for idx, row in all_event.iterrows():
-#  if (row['event'] == split_nevt['event'] and row['addbjet1_pt'] == split_nevt['addbjet1_pt'] and row['addbjet2_pt'] == split_nevt['addbjet2_pt'] ):
   if (row['event'] == split_nevt['event']):
     if split_point < 0: split_point = idx
 train_event = all_event[:split_point]
@@ -353,7 +347,7 @@ X_test = data_test_sc
 #Keras model compile and training
 #################################
 nvar = len(ut.getVarlist())
-a = 50
+a = 300
 b = 0.08
 init = 'glorot_uniform'
 
@@ -369,10 +363,10 @@ with tf.device("/cpu:0") :
     x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
     x = Dropout(b)(x)
     #x = add([x, branch_point1])
-    x = BatchNormalization()(x)
+##    x = BatchNormalization()(x)
     #branch_point2 = Dense(a, name='branch_point2')(x)
-    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
-    x = Dropout(b)(x)
+##    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
+##    x = Dropout(b)(x)
 #    x = BatchNormalization()(x)
 #    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
 #    x = Dropout(b)(x)

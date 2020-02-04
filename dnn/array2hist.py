@@ -36,6 +36,8 @@ import variableAnalyzer as var
 
 def ana(inputDir, process, outputDir, sys='', flag1=False):
 
+    ntuple_path = '/data/users/seohyun/ntuple/Run2018/V10_2/nosplit/' 
+
     if '__' in process:
         process = process.split('__')[0]
     print("Process: "+process+"\n")
@@ -106,6 +108,7 @@ def ana(inputDir, process, outputDir, sys='', flag1=False):
     nStep = 4
 
     selEvent = pd.read_hdf(inputDir+".h5") 
+#    selEvent = selEvent.reset_index(drop=True)
 
     #print "\nMerge arrays"
     #selEvent = pd.DataFrame([])
@@ -129,7 +132,6 @@ def ana(inputDir, process, outputDir, sys='', flag1=False):
     #ttbbFilter nMatchable: 5557
     countMatchable = True
     if countMatchable :
-#        df = pd.read_hdf("/home/sarakm0704/WORK/ttbb/TTBBDiff/dnn/array/array_train_ttbb.h5")
         df = pd.read_hdf("./array/array_train_ttbb.h5")
         df = df.filter(['signal','event','dR'], axis=1)
         df = df.query('signal > 0')
@@ -145,9 +147,9 @@ def ana(inputDir, process, outputDir, sys='', flag1=False):
 
 
     #print(selEvent)
-    if closureTest : f_out = ROOT.TFile(outputDir+'/'+modelfile+'/hist_closure.root', 'recreate')
-    elif sys == '' : f_out = ROOT.TFile(outputDir+'/'+modelfile+'/hist_'+process+'.root', 'recreate')
-    else           : f_out = ROOT.TFile(outputDir+'/'+modelfile+'/hist_'+process+sys+'.root', 'recreate')
+    if closureTest : f_out = TFile(outputDir+'/'+modelfile+'/hist_closure.root', 'recreate')
+    elif sys == '' : f_out = TFile(outputDir+'/'+modelfile+'/hist_'+process+'.root', 'recreate')
+    else           : f_out = TFile(outputDir+'/'+modelfile+'/hist_'+process+sys+'.root', 'recreate')
 
     nbins_reco_addjets_dr_fine = 12
     nbins_reco_addjets_dr = 4
@@ -585,6 +587,17 @@ def ana(inputDir, process, outputDir, sys='', flag1=False):
         h_respMatrix_deltaR[iChannel].ClearUnderflowAndOverflow()
         h_respMatrix_invMass[iChannel].ClearUnderflowAndOverflow()
 
+
+    f_ntuple = TFile.Open(os.path.join(ntuple_path, ntuple+'.root'),'read')
+    h_eventinfo = f_ntuple.Get("ttbbLepJets/EventInfo")
+    h_scaleweight = f_ntuple.Get("ttbbLepJets/ScaleWeights")
+
+    f_out.cd()
+    h_eventinfo.Write()
+    h_scaleweight.Write()
+    f_out.Write()
+    f_out.Close()
+    #f_pred.close()
     keras.backend.clear_session()
 
     timer.Stop()
@@ -616,7 +629,7 @@ if __name__ == '__main__':
  
     start_time = time.time()
 
-    ntupleDir = '/data/users/seohyun/ntuple/hep2019/split/'
+    ntupleDir = '/data/users/seohyun/ntuple/Run2018/V10_2/split/'
     arrayDir = './array/'
     histDir = './hist/'
 
