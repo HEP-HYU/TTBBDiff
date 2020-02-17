@@ -36,7 +36,7 @@ import variableAnalyzer as var
 
 def ana(inputDir, process, outputDir, sys='', flag1=False):
 
-    ntuple_path = '/data/users/seohyun/ntuple/Run2018/V10_2/nosplit/' 
+    ntuple_path = '/data/users/seohyun/ntuple/Run2018/V10_3/nosplit/' 
 
     if '__' in process:
         process = process.split('__')[0]
@@ -326,6 +326,28 @@ def ana(inputDir, process, outputDir, sys='', flag1=False):
     #f_pred.write('\n'+str(idx)+'\n'+str(selEvent[idx])+'\n')
     selEvent = selEvent[idx]
     selEvent.reset_index(drop=True, inplace=True)
+  
+    #draw a prediction
+    outfile = TFile.Open('h_prediction.root','RECREATE')
+
+    h_invmass_sig = TH1D('h_invmass_sig','',20,0,400)
+    h_dR_sig = TH1D('h_dR_sig','',20,0,4)
+    h_invmass_bkg = TH1D('h_invmass_bkg','',20,0,400)
+    h_dR_bkg = TH1D('h_dR_bkg','',20,0,4)
+
+    for index, event in selEvent.iterrows():
+      Mbb = event['bbMass']
+      dRbb = event['bbdR']
+
+      if event['signal'] > 0.5: 
+        h_invmass_sig.Fill(Mbb)
+        h_dR_sig.Fill(dRbb)
+      elif event['background'] > 0.5: 
+        h_invmass_bkg.Fill(Mbb)
+        h_dR_bkg.Fill(dRbb)
+      
+    outfile.Write()
+    outfile.Close()
 
     #selEvent.groupby('event').max('signal').reset_index(drop=True, inplace=True)
     #f_pred.write("Groupby\n"+process+"\n"+str(selEvent))

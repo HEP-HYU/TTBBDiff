@@ -303,7 +303,7 @@ if __name__ == '__main__':
     (options,args) = parser.parse_args()
 
 #    tmpDir = '/data/users/seohyun/ntuple/Run2017/V9_6/'
-    tmpDir = '/data/users/seohyun/ntuple/Run2018/V10_2/'
+    tmpDir = '/data/users/seohyun/ntuple/Run2018/V10_3'
     ntupleDir = tmpDir+'/split/'
     arrayDir = './array/'
 
