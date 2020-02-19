@@ -30,11 +30,13 @@ from keras.callbacks import Callback, ModelCheckpoint
 import utils as ut
 import multiprocessing as mp
 import time
-from tqdm import tqdm
+#from tqdm import tqdm
 
 import variableAnalyzer as var
 
 def ana(inputDir, process, outputDir, sys='', flag1=False):
+
+    ntuple_path = '/data/users/seohyun/ntuple/Run2018/V10_3/nosplit/' 
 
     if '__' in process:
         process = process.split('__')[0]
@@ -106,6 +108,7 @@ def ana(inputDir, process, outputDir, sys='', flag1=False):
     nStep = 4
 
     selEvent = pd.read_hdf(inputDir+".h5") 
+#    selEvent = selEvent.reset_index(drop=True)
 
     #print "\nMerge arrays"
     #selEvent = pd.DataFrame([])
@@ -129,7 +132,7 @@ def ana(inputDir, process, outputDir, sys='', flag1=False):
     #ttbbFilter nMatchable: 5557
     countMatchable = True
     if countMatchable :
-        df = pd.read_hdf("/home/sarakm0704/WORK/ttbb/ttbbRun2/deepAna/array/array_train_ttbb.h5")
+        df = pd.read_hdf("./array/array_train_ttbb.h5")
         df = df.filter(['signal','event','dR'], axis=1)
         df = df.query('signal > 0')
         #tmpId = df.groupby(['event'])['dR'].transform(max) == df['dR']
@@ -144,9 +147,9 @@ def ana(inputDir, process, outputDir, sys='', flag1=False):
 
 
     #print(selEvent)
-    if closureTest : f_out = ROOT.TFile(outputDir+'/'+modelfile+'/hist_closure.root', 'recreate')
-    elif sys == '' : f_out = ROOT.TFile(outputDir+'/'+modelfile+'/hist_'+process+'.root', 'recreate')
-    else           : f_out = ROOT.TFile(outputDir+'/'+modelfile+'/hist_'+process+sys+'.root', 'recreate')
+    if closureTest : f_out = TFile(outputDir+'/'+modelfile+'/hist_closure.root', 'recreate')
+    elif sys == '' : f_out = TFile(outputDir+'/'+modelfile+'/hist_'+process+'.root', 'recreate')
+    else           : f_out = TFile(outputDir+'/'+modelfile+'/hist_'+process+sys+'.root', 'recreate')
 
     nbins_reco_addjets_dr_fine = 12
     nbins_reco_addjets_dr = 4
@@ -323,6 +326,28 @@ def ana(inputDir, process, outputDir, sys='', flag1=False):
     #f_pred.write('\n'+str(idx)+'\n'+str(selEvent[idx])+'\n')
     selEvent = selEvent[idx]
     selEvent.reset_index(drop=True, inplace=True)
+  
+    #draw a prediction
+    outfile = TFile.Open('h_prediction.root','RECREATE')
+
+    h_invmass_sig = TH1D('h_invmass_sig','',20,0,400)
+    h_dR_sig = TH1D('h_dR_sig','',20,0,4)
+    h_invmass_bkg = TH1D('h_invmass_bkg','',20,0,400)
+    h_dR_bkg = TH1D('h_dR_bkg','',20,0,4)
+
+    for index, event in selEvent.iterrows():
+      Mbb = event['bbMass']
+      dRbb = event['bbdR']
+
+      if event['signal'] > 0.5: 
+        h_invmass_sig.Fill(Mbb)
+        h_dR_sig.Fill(dRbb)
+      elif event['background'] > 0.5: 
+        h_invmass_bkg.Fill(Mbb)
+        h_dR_bkg.Fill(dRbb)
+      
+    outfile.Write()
+    outfile.Close()
 
     #selEvent.groupby('event').max('signal').reset_index(drop=True, inplace=True)
     #f_pred.write("Groupby\n"+process+"\n"+str(selEvent))
@@ -584,6 +609,17 @@ def ana(inputDir, process, outputDir, sys='', flag1=False):
         h_respMatrix_deltaR[iChannel].ClearUnderflowAndOverflow()
         h_respMatrix_invMass[iChannel].ClearUnderflowAndOverflow()
 
+
+    f_ntuple = TFile.Open(os.path.join(ntuple_path, ntuple+'.root'),'read')
+    h_eventinfo = f_ntuple.Get("ttbbLepJets/EventInfo")
+    h_scaleweight = f_ntuple.Get("ttbbLepJets/ScaleWeights")
+
+    f_out.cd()
+    h_eventinfo.Write()
+    h_scaleweight.Write()
+    f_out.Write()
+    f_out.Close()
+    #f_pred.close()
     keras.backend.clear_session()
 
     timer.Stop()
@@ -615,7 +651,7 @@ if __name__ == '__main__':
  
     start_time = time.time()
 
-    ntupleDir = '/data/users/seohyun/ntuple/hep2019/split/'
+    ntupleDir = '/data/users/seohyun/ntuple/Run2018/V10_2/split/'
     arrayDir = './array/'
     histDir = './hist/'
 

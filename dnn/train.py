@@ -73,6 +73,7 @@ if os.environ["CUDA_VISIBLE_DEVICES"] in ["0","1","2","3"] : multiGPU = False
 #list for scores plotting
 auc_list = []
 val_auc_list = []
+mateff = []
 
 #######################
 #Plot correlaton matrix
@@ -147,12 +148,13 @@ def inputvars(sigdata, bkgdata, signame, bkgname, **kwds):
 #Compute AUC after training and plot ROC
 ########################################
 class roc_callback(Callback):
-    def __init__(self, training_data, validation_data, model):
+    def __init__(self, training_data, validation_data, model, event):
         self.x = training_data[0]
         self.y = training_data[1]
         self.x_val = validation_data[0]
         self.y_val = validation_data[1]
         self.model_to_save = model
+        self.event = event
 
     def on_train_begin(self, logs={}):
         return
@@ -175,6 +177,20 @@ class roc_callback(Callback):
         print('\rroc-auc: %s - roc-auc_val: %s' % (str(round(roc,4)), str(round(roc_val,4))),end=100*' '+'\n')
         auc_list.append(roc)
         val_auc_list.append(roc_val)
+
+        ######################
+        #Matching Efficiencies
+        ######################
+        test_nevt = len(self.event.drop_duplicates(subset=['event']))
+        df_y_pred_val = pd.DataFrame(y_pred_val[:,1]).set_index(self.event.index)
+        df_y_pred_val = pd.concat([df_y_pred_val,self.event], axis=1)
+        df_y_pred_val.columns = df_y_pred_val.columns.map(str)
+        idx = df_y_pred_val.groupby(['event'])['0'].transform(max) == df_y_pred_val['0']
+        df_y_pred_val = df_y_pred_val[idx]
+        test_matched = len(df_y_pred_val.loc[df_y_pred_val['signal']==1])
+        test_match_eff = float(test_matched)/test_nevt
+        print('Matching efficiency = ' + str(test_matched) + ' / ' + str(test_nevt) + ' = ' + str(test_match_eff))
+        mateff.append(test_match_eff)
 
         ###################
         #Calculate f1 score
@@ -214,25 +230,25 @@ class roc_callback(Callback):
         high = max(np.max(d) for d in scores)
         low_high = (low,high)
 
-        #test is filled
-        plt.hist(tpr[1],
+        #train is filled
+        plt.hist(tpr[2],
             color='b', alpha=0.5, range=low_high, bins=bins,
-            histtype='stepfilled', density=True, label='S (test)')
-        plt.hist(fpr[1],
+            histtype='stepfilled', density=True, label='S (train)')
+        plt.hist(fpr[2],
             color='r', alpha=0.5, range=low_high, bins=bins,
-            histtype='stepfilled', density=True, label='B (test)')
+            histtype='stepfilled', density=True, label='B (train)')
 
-        #training is dotted
-        hist, bins = np.histogram(tpr[2], bins=bins, range=low_high, density=True)
-        scale = len(tpr[2]) / sum(hist)
+        #test is dotted
+        hist, bins = np.histogram(tpr[1], bins=bins, range=low_high, density=True)
+        scale = len(tpr[1]) / sum(hist)
         err = np.sqrt(hist * scale) / scale
         width = (bins[1] - bins[0])
         center = (bins[:-1] + bins[1:]) / 2
-        plt.errorbar(center, hist, yerr=err, fmt='o', c='b', label='S (training)')
-        hist, bins = np.histogram(fpr[2], bins=bins, range=low_high, density=True)
-        scale = len(tpr[2]) / sum(hist)
+        plt.errorbar(center, hist, yerr=err, fmt='o', c='b', label='S (test)')
+        hist, bins = np.histogram(fpr[1], bins=bins, range=low_high, density=True)
+        scale = len(tpr[1]) / sum(hist)
         err = np.sqrt(hist * scale) / scale
-        plt.errorbar(center, hist, yerr=err, fmt='o', c='r', label='B (training)')
+        plt.errorbar(center, hist, yerr=err, fmt='o', c='r', label='B (test)')
 
         plt.xlabel("Deep Learning Score")
         plt.ylabel("Arbitrary units")
@@ -265,12 +281,13 @@ data = pd.read_hdf(trainInput)
 ##########################################
 #col_names = list(data_train)
 labels = data.filter(['signal'], axis=1)
+all_event = data.filter(['event','signal'], axis=1)
+
 data = data.filter(['signal']+ut.getVarlist())
 data.astype('float32')
-#print list(data_train)
 
-#correlations(data.loc[data['signal'] == 0].drop('signal', axis=1), 'bkg')
-#correlations(data.loc[data['signal'] == 1].drop('signal', axis=1), 'sig')
+correlations(data.loc[data['signal'] == 0].drop('signal', axis=1), 'bkg')
+correlations(data.loc[data['signal'] == 1].drop('signal', axis=1), 'sig')
 
 #inputvars(data.loc[data['signal'] == 1].drop('signal', axis=1), data.loc[data['signal'] == 0].drop('signal', axis=1), 'sig', 'bkg')
 
@@ -279,16 +296,32 @@ data = data.drop('signal', axis=1) #then drop label
 ###############
 #split datasets
 ###############
-train_sig = labels.loc[labels['signal'] == 1].sample(frac=0.8,random_state=200)
-train_bkg = labels.loc[labels['signal'] == 0].sample(frac=0.8,random_state=200)
-test_sig = labels.loc[labels['signal'] == 1].drop(train_sig.index)
-test_bkg = labels.loc[labels['signal'] == 0].drop(train_bkg.index)
+#print(list(all_event))
+groupped_event = all_event.drop_duplicates(subset=['event'])
 
-train_idx = pd.concat([train_sig, train_bkg]).index
-test_idx = pd.concat([test_sig, test_bkg]).index
+nevt = len(groupped_event)
+print(len(groupped_event))
+
+split_nevt = groupped_event[:int(nevt*0.8)].iloc[-1]
+split_point = -1
+for idx, row in all_event.iterrows():
+  if (row['event'] == split_nevt['event']):
+    if split_point < 0: split_point = idx
+train_event = all_event[:split_point]
+test_event = all_event[split_point:]
+
+train_sig = train_event.loc[labels['signal'] == 1]
+train_bkg = train_event.loc[labels['signal'] == 0]
+
+test_sig = test_event.loc[labels['signal'] == 1]
+test_bkg = test_event.loc[labels['signal'] == 0]
+
+train_idx = pd.concat([train_sig, train_bkg]).sort_index().index
+test_idx = pd.concat([test_sig, test_bkg]).sort_index().index
 
 data_train = data.loc[train_idx,:].copy()
 data_test = data.loc[test_idx,:].copy()
+
 labels_train = labels.loc[train_idx,:].copy()
 labels_test = labels.loc[test_idx,:].copy()
 
@@ -330,37 +363,37 @@ with tf.device("/cpu:0") :
     x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
     x = Dropout(b)(x)
     #x = add([x, branch_point1])
-    x = BatchNormalization()(x)
+##    x = BatchNormalization()(x)
     #branch_point2 = Dense(a, name='branch_point2')(x)
-    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
-    x = Dropout(b)(x)
-    x = BatchNormalization()(x)
-    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
-    x = Dropout(b)(x)
-    #x = add([x, branch_point2])
-    x = BatchNormalization()(x)
-    #branch_point3 = Dense(a, name='branch_point3')(x)
-    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
-    x = Dropout(b)(x)
-    x = BatchNormalization()(x)
-    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
-    x = Dropout(b)(x)
-    #x = add([x, branch_point3])
-    x = BatchNormalization()(x)
-    #branch_point4 = Dense(a, name='branch_point4')(x)
-    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
-    x = Dropout(b)(x)
-    x = BatchNormalization()(x)
-    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
-    x = Dropout(b)(x)
-    #x = add([x, branch_point4])
-    x = BatchNormalization()(x)
-    #branch_point5 = Dense(a, name='branch_point5')(x)
-    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
-    x = Dropout(b)(x)
-    x = BatchNormalization()(x)
-    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
-    x = Dropout(b)(x)
+##    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
+##    x = Dropout(b)(x)
+#    x = BatchNormalization()(x)
+#    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
+#    x = Dropout(b)(x)
+#    #x = add([x, branch_point2])
+#    x = BatchNormalization()(x)
+#    #branch_point3 = Dense(a, name='branch_point3')(x)
+#    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
+#    x = Dropout(b)(x)
+#    x = BatchNormalization()(x)
+#    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
+#    x = Dropout(b)(x)
+#    #x = add([x, branch_point3])
+#    x = BatchNormalization()(x)
+#    #branch_point4 = Dense(a, name='branch_point4')(x)
+#    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
+#    x = Dropout(b)(x)
+#    x = BatchNormalization()(x)
+#    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
+#    x = Dropout(b)(x)
+#    #x = add([x, branch_point4])
+#    x = BatchNormalization()(x)
+#    #branch_point5 = Dense(a, name='branch_point5')(x)
+#    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
+#    x = Dropout(b)(x)
+#    x = BatchNormalization()(x)
+#    x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
+#    x = Dropout(b)(x)
     #x = add([x, branch_point5])
     #x = BatchNormalization()(x)
     #x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
@@ -379,10 +412,10 @@ modelfile = 'model_{epoch:02d}_{val_binary_accuracy:.4f}.h5'
 checkpoint = ModelCheckpoint(configDir+weightDir+ver+'/'+modelfile, monitor='val_binary_accuracy', verbose=1, save_best_only=False)#, mode='max')
 
 history = train_model.fit(X_train, Y_train,
-                             epochs=30, batch_size=1024,
+                             epochs=100, batch_size=1024,
                              validation_data=(X_test,Y_test),
                              #class_weight={ 0: 14, 1: 1 }, 
-                             callbacks=[roc_callback(training_data=(X_train,Y_train), validation_data=(X_test,Y_test), model=model)]
+                             callbacks=[roc_callback(training_data=(X_train,Y_train), validation_data=(X_test,Y_test), model=train_model, event=test_event)]
                              )
 
 print("Plotting scores")
@@ -413,16 +446,35 @@ plt.legend(['Train','Test'], loc='upper right')
 plt.savefig(os.path.join(configDir,weightDir+ver,'fig_score_auc.pdf'))
 plt.gcf().clear()
 
+plt.plot(mateff)
+plt.title('Matching Efficiencies with Epoch')
+plt.ylabel('Matching Efficiencies')
+plt.xlabel('Epoch')
+plt.legend(['Test'], loc='upper right')
+plt.savefig(os.path.join(configDir,weightDir+ver,'fig_score_mateff.pdf'))
+plt.gcf().clear()
+
 print("Now predict score with test set")
 bestModel = ""
-best_acc = 0.0
+best_mateff = 0.0
 for filename in os.listdir(configDir+weightDir+ver):
     if not "h5" in filename : continue
     tmp = filename.split('.')
-    tmp_acc = float("0."+tmp[1])
-    if tmp_acc > best_acc :
-        best_acc = tmp_acc
+    tmp_mateff = float("0."+tmp[1])
+    if tmp_mateff > best_mateff :
+        best_mateff = tmp_mateff
         bestModel = filename
+
+#print("Now predict score with test set")
+#bestModel = ""
+#best_mateff = 0.0
+#for filename in os.listdir(configDir+weightDir+ver):
+#    if not "h5" in filename : continue
+#    tmp = filename.split('.')
+#    tmp_mateff = float("0."+tmp[1])
+#    if tmp_mateff > best_mateff :
+#        best_mateff = tmp_mateff
+#        bestModel = filename
 
 print("Use "+bestModel)
 model_best = load_model(configDir+weightDir+ver+'/'+bestModel)
