@@ -12,22 +12,14 @@
 //#include "xsection.h"
 
 using namespace ROOT::VecOps;
-using rvec_f = const RVec<float> &;
-
-rvec_f scale( rvec_f pt ){
-  vector<float> out;
-  for( int i = 0; i < pt.size()-1 ; i++){
-    out.push_back(1.0);
-  }
-  rvec_f tmp(out.data(), out.size());
-  return tmp;
-}
+//using rvec_f = const RVec<float> &;
+using rvec_f = RVec<float>;
 
 //selected bjets (temporal)
 vector<int> bjet_idx(rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag)
 {
   vector<int> out;
-  for( int i = 0; i < pt.size()-1 ; i++){
+  for( int i = 0; i < pt.size(); i++){
     if( pt[i]*scale[i] > 30 && abs(eta[i]) < 2.4 && btag[i] > 0.7527){
       out.push_back(i);
     } 
@@ -39,8 +31,7 @@ vector<int> bjet_idx(rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag)
 vector<int> jet_idx(rvec_f pt, rvec_f eta, rvec_f scale)
 {
   vector<int> out;
-  for( int i = 0; i < pt.size()-1 ; i++){
-    cout << "test = " << scale[i] << endl;
+  for( int i = 0; i < pt.size(); i++){
     if( pt[i]*scale[i] > 30 && abs(eta[i]) < 2.4){
       out.push_back(i);
     } 
@@ -107,18 +98,17 @@ void ana_rdf(TString name = "TTLJ_PowhegPythia_ttbb", TString ch = "0"){
   TH1D * EventInfo = (TH1D*) f_info->Get("ttbbLepJets/EventInfo");
   double n = EventInfo->GetBinContent(2);
   double Xsection = 1.0;
-  //double lumi = 59000.0;
-
-//  if(  Xsections.find(name.Data()) != Xsections.end() ){
-//    Xsection = Xsections.find(name)->second ;
-//  } 
-
+/*
+  if(  Xsections.find(name.Data()) != Xsections.end() ){
+    Xsection = Xsections.find(name)->second ;
+  } 
+*/
   auto fileName_dnn = Form("dnn_tree_%s_Ch%s.root", name.Data(), ch.Data());
   auto treeName = "tree";
   auto df_ch = df.Filter(Form("channel == %s", ch.Data()) );
 
   if( name.Contains("Data") ){
-    df_ch = df_ch.Define("jet_scale",scale,{"jet_pt"});
+    df_ch = df_ch.Define("jet_scale","rvec_f(jet_pt.size(), 1.0f);");
     df_ch = df_ch.Define("weight","1");
   }else{
     df_ch = df_ch.Define("jet_scale","jet_JER_Nom");
@@ -153,28 +143,7 @@ void ana_rdf(TString name = "TTLJ_PowhegPythia_ttbb", TString ch = "0"){
   auto h_nbjets = df_S2.Define("nbjets","Sum(jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 && jet_deepCSV > 0.7527)").Histo1D({"h_nbjets", "", 5, 0, 5}, "nbjets","weight");
 
   df_S2 = df_S2.Define("jet_idx",jet_idx,{"jet_pt","jet_eta","jet_scale"});
-/*
-  //for jet scale :(
-  if( name.Contains("Data") ){
-    df_S2 = df_S2.Define("jet1_pT","jet_pt[jet_idx[0]]")
-                 .Define("jet2_pT","jet_pt[jet_idx[1]]")
-                 .Define("jet3_pT","jet_pt[jet_idx[2]]")
-                 .Define("jet4_pT","jet_pt[jet_idx[3]]");
-  }else{
-    df_S2 = df_S2.Define("jet1_pT","jet_pt[jet_idx[0]]*jet_scale[jet_idx[0]]")
-                 .Define("jet2_pT","jet_pt[jet_idx[1]]*jet_scale[jet_idx[1]]")
-                 .Define("jet3_pT","jet_pt[jet_idx[2]]*jet_scale[jet_idx[2]]")
-                 .Define("jet4_pT","jet_pt[jet_idx[3]]*jet_scale[jet_idx[3]]");
-  }
-  auto h_jet1_pt_S2 = df_S2.Histo1D({"h_jet1_pt_S2","",20,0,400},"jet1_pT","weight");
-  auto h_jet1_eta_S2 = df_S2.Histo1D({"h_jet1_eta_S2","",40,-2.5,2.5},"jet1_Eta","weight");
-  auto h_jet2_pt_S2 = df_S2.Histo1D({"h_jet2_pt_S2","",20,0,400},"jet2_pT","weight");
-  auto h_jet2_eta_S2 = df_S2.Histo1D({"h_jet2_eta_S2","",40,-2.5,2.5},"jet2_Eta","weight");
-  auto h_jet3_pt_S2 = df_S2.Histo1D({"h_jet3_pt_S2","",20,0,400},"jet3_pT","weight");
-  auto h_jet3_eta_S2 = df_S2.Histo1D({"h_jet3_eta_S2","",40,-2.5,2.5},"jet3_Eta","weight");
-  auto h_jet4_pt_S2 = df_S2.Histo1D({"h_jet4_pt_S2","",20,0,400},"jet4_pT","weight");
-  auto h_jet4_eta_S2 = df_S2.Histo1D({"h_jet4_eta_S2","",40,-2.5,2.5},"jet4_Eta","weight");
-*/
+  
   auto h_jet1_pt_S2 = df_S2.Define("jet1_pT","jet_pt[jet_idx[0]]*jet_scale[jet_idx[0]]").Histo1D({"h_jet1_pt_S2","",20,0,400},"jet1_pT","weight");
   auto h_jet1_eta_S2 = df_S2.Define("jet1_Eta","abs(jet_eta[jet_idx[0]])").Histo1D({"h_jet1_eta_S2","",20,0,2.5},"jet1_Eta","weight");
   auto h_jet2_pt_S2 = df_S2.Define("jet2_pT","jet_pt[jet_idx[1]]*jet_scale[jet_idx[1]]").Histo1D({"h_jet2_pt_S2","",20,0,400},"jet2_pT","weight");
@@ -208,7 +177,7 @@ void ana_rdf(TString name = "TTLJ_PowhegPythia_ttbb", TString ch = "0"){
 
 
   //create ntuple 
-  df_S3.Snapshot(treeName, fileName_dnn, {"mbb","dRbb","jet_scale"});
+  df_S3.Snapshot(treeName, fileName_dnn, {"mbb","dRbb"});
   TFile f(Form("hist/hist_%s_Ch%s.root", name.Data(), ch.Data()),"recreate");
   h_njets->Write();
   h_lepton_pt_S1->Write();
