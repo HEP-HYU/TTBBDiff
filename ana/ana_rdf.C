@@ -14,6 +14,27 @@
 using namespace ROOT::VecOps;
 using rvec_f = RVec<float>;
 
+RVec<float> signal_label(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f ad1_eta, rvec_f ad1_phi, rvec_f ad2_eta, rvec_f ad2_phi){
+
+    RVec<float> label(idx.size());
+    for( size_t i = 0; i < idx.size(); i++ ){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      bool pass_btag = btag[i1] >  0.7527 && btag[i2] > 0.7527;
+      if( !(pass_jet && pass_btag) ) continue;
+
+      bool matched_1 = ( DeltaR(eta[i1], ad1_eta[0], phi[i1], ad1_phi[0]) < 0.4 ) && ( DeltaR(eta[i2], ad2_eta[0], phi[i2], ad2_phi[0]) < 0.4 );
+      bool matched_2 = ( DeltaR(eta[i1], ad2_eta[0], phi[i1], ad2_phi[0]) < 0.4 ) && ( DeltaR(eta[i2], ad1_eta[0], phi[i2], ad1_phi[0]) < 0.4 );
+
+      if(matched_1 || matched_2) label[i] = 1;
+      else label[i] = 0;
+    }
+
+    return label;
+
+}
+
+
 //b jet combination
 RVec<RVec<size_t>> jet_combi(rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag){
 
@@ -168,6 +189,7 @@ void ana_rdf(TString name = "TTLJ_PowhegPythia_ttbb", TString ch = "0"){
   //Define variables
   df_S3 = df_S3.Define("bjet_idx",bjet_idx,{"jet_pt","jet_eta","jet_scale","jet_deepCSV"})
                .Define("jet_combi_idx", jet_combi, {"jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepCSV"})
+               .Define("signal", signal_label, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepCSV","addbjet1_eta","addbjet1_phi","addbjet2_eta","addbjet2_phi"})
                .Define("mbb", compute_mass, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepCSV"})
                .Define("dRbb", compute_dR, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepCSV"});
 
@@ -188,7 +210,7 @@ void ana_rdf(TString name = "TTLJ_PowhegPythia_ttbb", TString ch = "0"){
 //  h_jet_phi_S2->Scale();
 
   //create ntuple
-  if( name.Contains("ttbb") ) df_S3.Snapshot("dnn_tree", "dnn_tree/dnn_train_ttbb.root", {"mbb","dRbb","nbjets"});
+  if( name.Contains("ttbb") ) df_S3.Snapshot("dnn_tree", "dnn_tree/dnn_train_ttbb.root", {"signal","mbb","dRbb","nbjets"});
   TFile f(Form("hist/hist_%s_Ch%s.root", name.Data(), ch.Data()),"recreate");
   h_njets_S1->Write();
   h_lepton_pt_S1->Write();
