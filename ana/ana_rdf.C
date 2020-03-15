@@ -10,15 +10,17 @@
 #include "Math/Vector4Dfwd.h"
 #include <vector>
 //#include "xsection.h"
+//#include "selection.h"
 
 using namespace ROOT::VecOps;
 using rvec_f = RVec<float>;
 
 RVec<float> signal_label(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f ad1_eta, rvec_f ad1_phi, rvec_f ad2_eta, rvec_f ad2_phi){
 
-    RVec<float> label(idx.size());
+    rvec_f label;
     for( size_t i = 0; i < idx.size(); i++ ){
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      //need to be simpler
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
       bool pass_btag = btag[i1] >  0.7527 && btag[i2] > 0.7527;
       if( !(pass_jet && pass_btag) ) continue;
@@ -26,14 +28,13 @@ RVec<float> signal_label(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, r
       bool matched_1 = ( DeltaR(eta[i1], ad1_eta[0], phi[i1], ad1_phi[0]) < 0.4 ) && ( DeltaR(eta[i2], ad2_eta[0], phi[i2], ad2_phi[0]) < 0.4 );
       bool matched_2 = ( DeltaR(eta[i1], ad2_eta[0], phi[i1], ad2_phi[0]) < 0.4 ) && ( DeltaR(eta[i2], ad1_eta[0], phi[i2], ad1_phi[0]) < 0.4 );
 
-      if(matched_1 || matched_2) label[i] = 1;
-      else label[i] = 0;
+      if(matched_1 || matched_2) label.push_back(1);
+      else label.push_back(0);
     }
 
     return label;
 
 }
-
 
 //b jet combination
 RVec<RVec<size_t>> jet_combi(rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag){
@@ -80,7 +81,7 @@ vector<int> jet_idx(rvec_f pt, rvec_f eta, rvec_f scale)
 
 RVec<float> compute_mass(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag)
 {
-    RVec<float> var(idx.size());
+    rvec_f var;
     for( size_t i = 0; i < idx.size() ; i++){
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
@@ -88,20 +89,20 @@ RVec<float> compute_mass(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, r
       if( !(pass_jet && pass_btag) ) continue;
       ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
       ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
-      var[i] = (p1 + p2).M();
+      var.push_back((p1 + p2).M());
     }
     return var;
 }
 
 RVec<float> compute_dR(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag)
-{
-    RVec<float> var(idx.size());
+{   
+    rvec_f var;
     for( size_t i = 0; i < idx.size() ; i++){
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
       bool pass_btag = btag[i1] >  0.7527 && btag[i2] > 0.7527;
       if( !(pass_jet && pass_btag) ) continue;
-      var[i] = DeltaR(eta[i1], eta[i2], phi[i1], phi[i2]);
+      var.push_back( DeltaR(eta[i1], eta[i2], phi[i1], phi[i2]) );
     }   
     return var;
 }
@@ -119,20 +120,21 @@ void ana_rdf(TString name = "TTLJ_PowhegPythia_ttbb", TString ch = "0"){
   // Enable multi-threading
   //ROOT::EnableImplicitMT();
 
-  ROOT::RDataFrame df("ttbbLepJets/tree",Form("/cms/ldap_home/sarakm0704/WORK/ttbb/ntuple/Run2018/V10_2/%s.root", name.Data()) );
+  ROOT::RDataFrame df("ttbbLepJets/tree",Form("/cms/ldap_home/sarakm0704/public/ntuple/Run2018/V10_2/%s.root", name.Data()) );
 //  ROOT::RDataFrame df("ttbbLepJets/tree","/cms/ldap_home/sarakm0704/WORK/ttbb/ntuple/Run2017/V9_6/TTLJ_PowhegPythia_ttbb.root"); //2017
 //  ROOT::RDataFrame df("ttbbLepJets/tree","/cms/ldap_home/sarakm0704/WORK/ttbb/ntuple/Run2016/v808/TTLJ_PowhegPythia_ttbb.root"); //2016
 
-  TFile *f_info = new TFile(Form("/cms/ldap_home/sarakm0704/WORK/ttbb/ntuple/Run2018/V10_2/%s.root", name.Data()));
+  TFile *f_info = new TFile(Form("/cms/ldap_home/sarakm0704/public/ntuple/Run2018/V10_2/%s.root", name.Data()));
+/*
   TH1D * EventInfo = (TH1D*) f_info->Get("ttbbLepJets/EventInfo");
   double n = EventInfo->GetBinContent(2);
   double Xsection = 1.0;
-/*
+
   if(  Xsections.find(name.Data()) != Xsections.end() ){
     Xsection = Xsections.find(name)->second ;
   } 
 */
-  auto df_ch = df.Filter(Form("channel == %s", ch.Data()) );
+  auto df_ch = df.Filter(Form("channel == %s", ch.Data()),"lepton channel");
 
   if( name.Contains("Data") ){
     df_ch = df_ch.Define("jet_scale","rvec_f(jet_pt.size(), 1.0f);");
@@ -168,7 +170,6 @@ void ana_rdf(TString name = "TTLJ_PowhegPythia_ttbb", TString ch = "0"){
 
   df_S2 = df_S2.Define("jet_idx",jet_idx,{"jet_pt","jet_eta","jet_scale"})
                .Define("nbjets","Sum(jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 && jet_deepCSV > 0.7527)");
-//               .Define("jet1_pT","jet_pt[jet_idx[0]]*jet_scale[jet_idx[0]]");
 //               .Define("jet_sel_pt,"for(int i = 0; i < pt.size(); i++){ if( jet_pt[i]*jet_scale[i] > 30) return jet_pt, jet_eta;}");
 
   auto h_nbjets_S2 = df_S2.Histo1D({"h_nbjets_S2", "", 5, 0, 5}, "nbjets","weight");
@@ -193,13 +194,16 @@ void ana_rdf(TString name = "TTLJ_PowhegPythia_ttbb", TString ch = "0"){
                .Define("mbb", compute_mass, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepCSV"})
                .Define("dRbb", compute_dR, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepCSV"});
 
+//instant number?
+//  df_var = df_S3.Define("number","rvec_f(jet_pt.size(), 1.0f);").Define("test1", compute_var, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepCSV","number"});
+
   auto h_mbb_S3 = df_S3.Histo1D({"h_mbb_S3", "", 10, 70, 170}, "mbb");
   auto h_dRbb_S3 = df_S3.Histo1D({"h_dRbb_S3", "", 20 , 0, 4}, "dRbb");
 
   auto h_bjet1_pt_S3 = df_S3.Define("bjet1_pT","jet_pt[bjet_idx[0]]*jet_scale[bjet_idx[0]]").Histo1D({"h_bjet1_pt_S3","",20,0,400},"bjet1_pT","b_weight");
   auto h_bjet2_pt_S3 = df_S3.Define("bjet2_pT","jet_pt[bjet_idx[1]]*jet_scale[bjet_idx[1]]").Histo1D({"h_bjet2_pt_S3","",20,0,400},"bjet2_pT","b_weight");
 
-//  //scale histogram
+//  //scale histogram 
 //  h_njets_S1->Scale();
 //  h_lepton_pt_S1->Scale();
 //  h_lepton_eta_S1->Scale();
@@ -210,7 +214,7 @@ void ana_rdf(TString name = "TTLJ_PowhegPythia_ttbb", TString ch = "0"){
 //  h_jet_phi_S2->Scale();
 
   //create ntuple
-  if( name.Contains("ttbb") ) df_S3.Snapshot("dnn_tree", "dnn_tree/dnn_train_ttbb.root", {"signal","mbb","dRbb","nbjets"});
+  if( name.Contains("ttbb") ) df_S3.Snapshot("dnn_tree", "dnn_tree/dnn_train_ttbb.root", {"signal","mbb","dRbb"});
   TFile f(Form("hist/hist_%s_Ch%s.root", name.Data(), ch.Data()),"recreate");
   h_njets_S1->Write();
   h_lepton_pt_S1->Write();
