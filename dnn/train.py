@@ -34,7 +34,7 @@ from keras.callbacks import Callback, ModelCheckpoint
 
 import utils as ut
 
-trainInput = "array/array_train_ttbb.h5"
+trainInput = "rdf_array/array_dnn_TTLJ_PowhegPythia_ttbb.h5"
 ver = ""
 configDir = ""
 weightDir = ""
@@ -283,7 +283,9 @@ data = pd.read_hdf(trainInput)
 labels = data.filter(['signal'], axis=1)
 all_event = data.filter(['event','signal'], axis=1)
 
-data = data.filter(['signal']+ut.getVarlist())
+#data = data.filter(['signal']+ut.getVarlist())
+name_inputvar = ['mbb','dRbb','pt1','pt2','eta1','eta2'] #for rdf. tmporary
+data = data.filter(['signal']+name_inputvar)
 data.astype('float32')
 
 correlations(data.loc[data['signal'] == 0].drop('signal', axis=1), 'bkg')
@@ -346,7 +348,8 @@ X_test = data_test_sc
 #################################
 #Keras model compile and training
 #################################
-nvar = len(ut.getVarlist())
+#nvar = len(ut.getVarlist())
+nvar = len(name_inputvar)
 a = 300
 b = 0.08
 init = 'glorot_uniform'
