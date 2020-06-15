@@ -10,7 +10,7 @@ from keras.optimizers import Adam, SGD
 from keras.callbacks import Callback, ModelCheckpoint
 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "2, 3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
 
 from sklearn.utils import class_weight
 from sklearn.metrics import roc_auc_score, roc_curve
@@ -28,10 +28,13 @@ import os
 
 from sklearn.preprocessing import StandardScaler, label_binarize
 
-trainInput = "rdf_array/array_dnn_TTLJ_PowhegPythia_ttbb.h5"
-name_inputvar = ['mbb','dRbb','pt1','pt2','eta1','eta2']
+trainInput = 'rdf_array/array_dnn_TTLJ_PowhegPythia_ttbb.h5'
 
-model_name = 'test_5l_n300_ep50_withWeight'
+name_inputvar = ['mbb','dRbb','dPhibb','dEtabb','Etabb','Phibb','mlbb','dRlbb','mlb1','dRlb1','mlb2','dRlb2','mnubb','dRnubb','mnub1','dRnub1','mnub2','dRnub2','dRlnubb','pt1','pt2','eta1','eta2','d1','d2','e1','e2','m1','m2','nbjets','lepton_pt','lepton_eta','lepton_e','MET','MET_phi']
+
+print ("number of variables: "+str(len(list(name_inputvar))))
+
+model_name = 'sample'
 df_data = pd.read_hdf(trainInput)
 data = df_data
 
@@ -51,12 +54,13 @@ groupped_event = all_event.drop_duplicates(subset=['event'])
 nevt = len(groupped_event)
 print("number of total event = "+str(len(groupped_event)))
 
-split_nevt = groupped_event[:int(nevt*0.8)].iloc[-1]
+#split_nevt = groupped_event[:int(nevt*0.8)].iloc[-1]
+split_nevt = groupped_event[:int(nevt*0.9)].iloc[-1]
 split_point = -1
 for idx, row in all_event.iterrows():
   if (row['event'] == split_nevt['event']):
     if split_point < 0: split_point = idx
-
+#need to check
 train_event = all_event[:split_point]
 valid_event = all_event[split_point:]
 
@@ -100,7 +104,7 @@ all_data = scaler.fit_transform(all_data)
 #Keras model compile and training
 #################################
 nvar = len(name_inputvar)
-a = 300
+a = 200
 b = 0.08
 init = 'glorot_uniform'
 
@@ -117,7 +121,7 @@ with tf.device("/cpu:0") :
     x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
     x = Dropout(b)(x)
     x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
-    x = Dropout(b)(x)
+    #x = Dropout(b)(x)
     outputs = Dense(1, activation='sigmoid')(x)
     model = Model(inputs=inputs, outputs=outputs)
 
@@ -131,9 +135,9 @@ else:
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy','binary_accuracy'])
     checkpoint = ModelCheckpoint(model_name, monitor='val_binary_accuracy', verbose=1, save_best_only=False)
     history = model.fit(train_data, train_label,
-                        epochs=50, batch_size=1024,
+                        epochs=30, batch_size=2048,
                         validation_data=(valid_data,valid_label),
-                        #class_weight={0:0.1,1:0.8}
+#                        class_weight={0:0.2,1:0.8}
                         )
 
     os.mkdir("models/"+model_name)
@@ -143,8 +147,10 @@ else:
     ######################################
     #   prediction on train & valid set  #
     ######################################
-    pred_data = pd.DataFrame(model.predict(train_data, batch_size=1024), columns=['pred']).set_index(train_event.index)
+    pred_data = pd.DataFrame(model.predict(train_data, batch_size=2048), columns=['pred']).set_index(train_event.index)
     pred = pd.concat([pred_data,train_event], axis=1)
+#    pred.columns = pred.columns.map(str)
+#    idx = pred.groupby(['event'])['0'].transform(max) == pred['0']
     idx = pred.groupby(['event'])['pred'].transform(max) == pred['pred']
     pred = pred[idx]
     train_nevt = len(train_event.drop_duplicates(subset=['event']))
@@ -155,8 +161,10 @@ else:
     print('\nMatching efficiency on train set = ' + str(train_matched) + ' / ' + str(train_nevt) + ' = ' + str(train_match_eff))
     print('Reconstruction efficiency on train set = ' + str(train_matched) + ' / ' + str(train_nevt_matchable) + ' = ' + str(train_recon_eff))
 
-    pred_val_data = pd.DataFrame(model.predict(valid_data, batch_size=1024), columns=['pred']).set_index(valid_event.index)
+    pred_val_data = pd.DataFrame(model.predict(valid_data, batch_size=2048), columns=['pred']).set_index(valid_event.index)
     pred_val = pd.concat([pred_val_data,valid_event], axis=1)
+#    pred_val.columns = pred_val.columns.map(str)
+#    idx = pred_val.groupby(['event'])['0'].transform(max) == pred_val['0']
     idx = pred_val.groupby(['event'])['pred'].transform(max) == pred_val['pred']
     pred_val = pred_val[idx]
     val_nevt = len(valid_event.drop_duplicates(subset=['event']))
@@ -171,9 +179,9 @@ else:
     f_ratio = open("models/"+model_name+'/matching_eff.txt','a')
     f_ratio.write("\n"+model_name)
     f_ratio.write('\nMatching efficiency on train set = ' + str(train_matched) + ' / ' + str(train_nevt) + ' = ' + str(train_match_eff))
-    f_ratio.write('Reconstruction efficiency on train set = ' + str(train_matched) + ' / ' + str(train_nevt_matchable) + ' = ' + str(train_recon_eff))
+    f_ratio.write('\nReconstruction efficiency on train set = ' + str(train_matched) + ' / ' + str(train_nevt_matchable) + ' = ' + str(train_recon_eff))
     f_ratio.write('\nMatching efficiency on validation set = ' + str(val_matched) + ' / ' + str(val_nevt) + ' = ' + str(val_match_eff))
-    f_ratio.write('Reconstruction efficiency on validation set = ' + str(val_matched) + ' / ' + str(val_nevt_matchable) + ' = ' + str(val_recon_eff))
+    f_ratio.write('\nReconstruction efficiency on validation set = ' + str(val_matched) + ' / ' + str(val_nevt_matchable) + ' = ' + str(val_recon_eff))
     f_ratio.close()
 
     import matplotlib.pyplot as plt
@@ -199,7 +207,7 @@ else:
     plt.legend(['Train','Valid'],loc='upper right')
     plt.savefig(os.path.join("models/"+model_name+'/','fig_score_acc.pdf'))
     plt.gcf().clear()
-    print('Loss curve is saved!')
+    print('Accuracy curve is saved!')
 
     ######################################
     #           Plot ROC curve           #
@@ -249,6 +257,7 @@ else:
     plt.errorbar(center, hist, yerr=err, fmt='o', c='r', label='B (valid)')
     
     plt.xlabel("Deep Learning Score")
+    #plt.ylabel("Arbitrary units")
     plt.ylabel("Number of Combinations")
     plt.legend(loc='best')
     plt.savefig(os.path.join("models/"+model_name+'/','fig_score_overtraining.pdf'))
@@ -260,8 +269,10 @@ else:
 #################################
 #     Prediction on all set     #
 #################################
-pred_all = pd.DataFrame(model.predict(all_data, batch_size=1024), columns=['pred']).set_index(all_event.index)
+pred_all = pd.DataFrame(model.predict(all_data, batch_size=2048), columns=['pred']).set_index(all_event.index)
 pred_all = pd.concat([pred_all,all_event], axis=1)
+#pred_all.columns = pred_all.columns.map(str)
+#idx = pred_all.groupby(['event'])['0'].transform(max) == pred_all['0']
 idx = pred_all.groupby(['event'])['pred'].transform(max) == pred_all['pred']
 pred_all = pred_all[idx]
 all_nevt = len(all_event.drop_duplicates(subset=['event']))
@@ -277,5 +288,3 @@ f_ratio.write("\n"+model_name)
 f_ratio.write('\nMatching efficiency on all set = ' + str(all_matched) + ' / ' + str(all_nevt) + ' = ' + str(all_match_eff))
 f_ratio.write('\nReconstruction efficiency on all set = ' + str(all_matched) + ' / ' + str(all_nevt_matchable) + ' = ' + str(all_recon_eff))
 f_ratio.close()
-
-
