@@ -15,7 +15,7 @@
 using namespace ROOT::VecOps;
 using rvec_f = RVec<float>;
 
-vector<int> signal_label(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f ad1_eta, rvec_f ad1_phi, rvec_f ad2_eta, rvec_f ad2_phi){
+vector<int> signal_label(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f btag_wp, rvec_f ad1_eta, rvec_f ad1_phi, rvec_f ad2_eta, rvec_f ad2_phi){
 
 //    rvec_f label;
     vector<int> label;
@@ -23,9 +23,9 @@ vector<int> signal_label(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, r
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
       //need to be simpler
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
-      if (!pass_jet) continue;
-//      bool pass_btag = btag[i1] >  0.8484 && btag[i2] > 0.8484;
-//      if( !(pass_jet && pass_btag) ) continue;
+//      if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
 
       bool matched_1 = ( DeltaR(eta[i1], ad1_eta[0], phi[i1], ad1_phi[0]) < 0.4 ) && ( DeltaR(eta[i2], ad2_eta[0], phi[i2], ad2_phi[0]) < 0.4 );
       bool matched_2 = ( DeltaR(eta[i1], ad2_eta[0], phi[i1], ad2_phi[0]) < 0.4 ) && ( DeltaR(eta[i2], ad1_eta[0], phi[i2], ad1_phi[0]) < 0.4 );
@@ -38,7 +38,7 @@ vector<int> signal_label(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, r
 
 }
 
-RVec<RVec<size_t>> jet_combi_border(rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag){
+RVec<RVec<size_t>> jet_combi_border(rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp){
  
   auto sorted_btag = Reverse(Argsort(btag));//sort as b-discriminator
 
@@ -61,7 +61,7 @@ RVec<RVec<size_t>> jet_combi_border(rvec_f pt, rvec_f eta, rvec_f phi, rvec_f en
 }
 
 //b jet combination
-RVec<RVec<size_t>> jet_combi(rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag){
+RVec<RVec<size_t>> jet_combi(rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp){
 
   size_t total = pt.size()*(pt.size()-1)/2; //total number of combination 
   RVec<RVec<size_t>> idx(total);
@@ -80,11 +80,11 @@ RVec<RVec<size_t>> jet_combi(rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, r
 }
 
 //selected bjets (temporal)
-vector<int> bjet_idx(rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag)
+vector<int> bjet_idx(rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag, rvec_f btag_wp)
 {
   vector<int> out;
   for( int i = 0; i < pt.size(); i++){
-    if( pt[i]*scale[i] > 30 && abs(eta[i]) < 2.4 && btag[i] > 0.8484){
+    if( pt[i]*scale[i] > 30 && abs(eta[i]) < 2.4 && btag[i] > btag_wp[0]){
       out.push_back(i);
     } 
   }
@@ -103,15 +103,324 @@ vector<int> jet_idx(rvec_f pt, rvec_f eta, rvec_f scale)
   return out;
 }
 
-vector<float> compute_mass(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag)
+vector<float> compute_dRlnub2( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f btag_wp, float lep_pt, float lep_eta, float lep_phi, float lep_e, float met_pt, float met_phi )
+{
+    vector<float> var;
+    ROOT::Math::PtEtaPhiEVector nu(met_pt, 0.0f, met_phi, met_pt);
+    ROOT::Math::PtEtaPhiEVector lep(lep_pt, lep_eta, lep_phi, lep_e);
+    float Wleta = (nu+lep).Eta();
+    float Wlphi = (nu+lep).Phi();
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+//      if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back( DeltaR( Wleta, eta[i2], Wlphi, phi[i2]) );
+    }
+    return var;
+}
+
+vector<float> compute_dRlnub1( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f btag_wp, float lep_pt, float lep_eta, float lep_phi, float lep_e, float met_pt, float met_phi )
+{
+    vector<float> var;
+    ROOT::Math::PtEtaPhiEVector nu(met_pt, 0.0f, met_phi, met_pt);
+    ROOT::Math::PtEtaPhiEVector lep(lep_pt, lep_eta, lep_phi, lep_e);
+    float Wleta = (nu+lep).Eta();
+    float Wlphi = (nu+lep).Phi();
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+//      if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back( DeltaR( Wleta, eta[i1], Wlphi, phi[i1]) );
+    }
+    return var;
+}
+
+vector<float> compute_dRlnubb( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp, float lep_pt, float lep_eta, float lep_phi, float lep_e, float met_pt, float met_phi )
+{
+    vector<float> var;
+    ROOT::Math::PtEtaPhiEVector nu(met_pt, 0.0f, met_phi, met_pt);
+    ROOT::Math::PtEtaPhiEVector lep(lep_pt, lep_eta, lep_phi, lep_e);
+    float Wleta = (nu+lep).Eta();
+    float Wlphi = (nu+lep).Phi();
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+//      if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
+      ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
+      float teta = (p1+p2).Eta();
+      float tphi = (p1+p2).Phi();
+      var.push_back( DeltaR( Wleta, teta, Wlphi, tphi) );
+    }
+    return var;
+}
+
+vector<float> compute_massnubb(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp, float met_pt, float met_phi)
+{
+    vector<float> var;
+    ROOT::Math::PtEtaPhiEVector nu(met_pt, 0.0f, met_phi, met_pt);
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+//      if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
+      ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
+      var.push_back((p1 + p2 + nu).M());
+    }
+    return var;
+}
+
+vector<float> compute_dRnubb( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp, float met_phi )
 {
     vector<float> var;
     for( size_t i = 0; i < idx.size() ; i++){
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
-      //bool pass_btag = btag[i1] >  0.8484 && btag[i2] > 0.8484;
-      if (!pass_jet) continue;
-      //if( !(pass_jet && pass_btag) ) continue;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
+      ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
+      float teta = (p1+p2).Eta();
+      float tphi = (p1+p2).Phi();
+      var.push_back( DeltaR( teta, 0.0f, tphi, met_phi) );
+    }
+    return var;
+}
+
+vector<float> compute_massnub2( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp, float met_pt, float met_phi )
+{
+    vector<float> var;
+    ROOT::Math::PtEtaPhiEVector nu(met_pt, 0.0f, met_phi, met_pt);
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
+      var.push_back((p2 + nu).M());
+    }
+    return var;
+}
+
+vector<float> compute_massnub1( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp, float met_pt, float met_phi )
+{
+    vector<float> var;
+    ROOT::Math::PtEtaPhiEVector nu(met_pt, 0.0f, met_phi, met_pt);
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
+      var.push_back((p1 + nu).M());
+    }
+    return var;
+}
+
+vector<float> compute_dRnub2( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f btag_wp, float met_phi )
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back( DeltaR( eta[i2], 0.0f, phi[i2], met_phi) );
+    }
+    return var;
+}
+
+vector<float> compute_dRnub1( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f btag_wp, float met_phi )
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back( DeltaR( eta[i1], 0.0f, phi[i1], met_phi) );
+    }
+    return var;
+}
+
+vector<float> compute_masslbb(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp, float lep_pt, float lep_eta, float lep_phi, float lep_e)
+{
+    vector<float> var;
+    ROOT::Math::PtEtaPhiEVector lep(lep_pt, lep_eta, lep_phi, lep_e);
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
+      ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
+      var.push_back((p1 + p2 + lep).M());
+    }
+    return var;
+}
+
+vector<float> compute_dRlbb( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp, float lep_eta, float lep_phi )
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
+      ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
+      float teta = (p1+p2).Eta();
+      float tphi = (p1+p2).Phi();
+      var.push_back( DeltaR( teta, lep_eta, tphi, lep_phi) );
+    }
+    return var;
+}
+
+vector<float> compute_masslb2( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp, float lep_pt, float lep_eta, float lep_phi, float lep_e )
+{
+    vector<float> var;
+    ROOT::Math::PtEtaPhiEVector lep(lep_pt, lep_eta, lep_phi, lep_e);
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;   
+      ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
+      var.push_back( (p2 + lep).M() );
+    }
+    return var;
+}
+
+vector<float> compute_masslb1( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp, float lep_pt, float lep_eta, float lep_phi, float lep_e )
+{
+    vector<float> var;
+    ROOT::Math::PtEtaPhiEVector lep(lep_pt, lep_eta, lep_phi, lep_e);
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;   
+      ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
+      var.push_back( (p1 + lep).M() );
+    }
+    return var;
+}
+
+vector<float> compute_dRlb2( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f btag_wp, float lep_eta, float lep_phi )
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back( DeltaR( eta[i2], lep_eta, phi[i2], lep_phi) );
+    }
+    return var;
+}
+
+vector<float> compute_dRlb1( const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f btag_wp, float lep_eta, float lep_phi )
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back( DeltaR( eta[i1], lep_eta, phi[i1], lep_phi) );
+    }
+    return var;
+}
+
+vector<float> compute_dPhi(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f btag_wp)
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back(phi[i1]-phi[i2]);
+    }
+    return var;
+}
+
+
+vector<float> compute_dEta(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag, rvec_f btag_wp)
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back(eta[i1]-eta[i2]);
+    }
+    return var;
+}
+
+vector<float> compute_Eta(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp)
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
+      ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
+      var.push_back((p1 + p2).Eta());
+    }
+    return var;
+}
+
+vector<float> compute_Phi(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp)
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
+      ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
+      ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
+      var.push_back((p1 + p2).Phi());
+    }
+    return var;
+}
+
+vector<float> compute_mass(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp)
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
       ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
       ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
       var.push_back((p1 + p2).M());
@@ -119,106 +428,191 @@ vector<float> compute_mass(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta,
     return var;
 }
 
-vector<float> compute_dR(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag)
+vector<float> compute_dR(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f btag_wp)
 {   
     vector<float> var;
     for( size_t i = 0; i < idx.size() ; i++){
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
-      //bool pass_btag = btag[i1] >  0.8484 && btag[i2] > 0.8484;
-      if (!pass_jet) continue;
-//      if( !(pass_jet && pass_btag) ) continue;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
       var.push_back( DeltaR(eta[i1], eta[i2], phi[i1], phi[i2]) );
     }   
     return var;
 }
 
-vector<float> compute_bt1(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag)
+vector<float> compute_d1(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag, rvec_f btag_wp)
 {
     vector<float> var;
     for( size_t i = 0; i < idx.size() ; i++){
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
-      //bool pass_btag = btag[i1] >  0.8484 && btag[i2] > 0.8484;
-      if (!pass_jet) continue;
-      //if( !(pass_jet && pass_btag) ) continue;
+      //if (!pass_jet) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      if( !(pass_jet && pass_btag) ) continue;
       var.push_back(btag[i1]);
     }
     return var;
 }
 
-vector<float> compute_bt2(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag)
+vector<float> compute_d2(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag, rvec_f btag_wp)
 {
     vector<float> var;
     for( size_t i = 0; i < idx.size() ; i++){
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
-      //bool pass_btag = btag[i1] >  0.8484 && btag[i2] > 0.8484;
-      if (!pass_jet) continue;
-      //if( !(pass_jet && pass_btag) ) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      //if (!pass_jet) continue;
+      if( !(pass_jet && pass_btag) ) continue;
       var.push_back(btag[i2]);
     }
     return var;
 }
 
-vector<float> compute_bpt1(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag)
+vector<float> compute_bpt1(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag, rvec_f btag_wp)
 {
     vector<float> var;
     for( size_t i = 0; i < idx.size() ; i++){
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
-      //bool pass_btag = btag[i1] >  0.8484 && btag[i2] > 0.8484;
-      if (!pass_jet) continue;
-      //if( !(pass_jet && pass_btag) ) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      //if (!pass_jet) continue;
+      if( !(pass_jet && pass_btag) ) continue;
       var.push_back(pt[i1]);
     }
     return var;
 }
 
-vector<float> compute_bpt2(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag)
+vector<float> compute_bpt2(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag, rvec_f btag_wp)
 {
     vector<float> var;
     for( size_t i = 0; i < idx.size() ; i++){
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
-      //bool pass_btag = btag[i1] >  0.8484 && btag[i2] > 0.8484;
-      if (!pass_jet) continue;
-      //if( !(pass_jet && pass_btag) ) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      //if (!pass_jet) continue;
+      if( !(pass_jet && pass_btag) ) continue;
       var.push_back(pt[i2]);
     }
     return var;
 }
 
-vector<float> compute_beta1(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag)
+vector<float> compute_beta1(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag, rvec_f btag_wp)
 {
     vector<float> var;
     for( size_t i = 0; i < idx.size() ; i++){
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
-      //bool pass_btag = btag[i1] >  0.8484 && btag[i2] > 0.8484;
-      if (!pass_jet) continue;
-      //if( !(pass_jet && pass_btag) ) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      //if (!pass_jet) continue;
+      if( !(pass_jet && pass_btag) ) continue;
       var.push_back(eta[i1]);
     }
     return var;
 }
 
-vector<float> compute_beta2(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag)
+vector<float> compute_beta2(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag, rvec_f btag_wp)
 {
     vector<float> var;
     for( size_t i = 0; i < idx.size() ; i++){
       const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
       bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
-      //bool pass_btag = btag[i1] >  0.8484 && btag[i2] > 0.8484;
-      if (!pass_jet) continue;
-      //if( !(pass_jet && pass_btag) ) continue;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      //if (!pass_jet) continue;
+      if( !(pass_jet && pass_btag) ) continue;
       var.push_back(eta[i2]);
     }
     return var;
 }
 
+vector<float> compute_bphi1(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f btag_wp)
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      //if (!pass_jet) continue;
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back(phi[i1]);
+    }
+    return var;
+}
 
-float draw_mindR(rvec_f pt, rvec_f scale, rvec_f eta, rvec_f phi, rvec_f btag)
+vector<float> compute_bphi2(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f scale, rvec_f btag, rvec_f btag_wp)
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      //if (!pass_jet) continue;
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back(phi[i2]);
+    }
+    return var;
+}
+
+vector<float> compute_be1(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag, rvec_f btag_wp, rvec_f e)
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      //if (!pass_jet) continue;
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back(e[i1]);
+    }
+    return var;
+}
+
+vector<float> compute_be2(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f scale, rvec_f btag, rvec_f btag_wp, rvec_f e)
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      //if (!pass_jet) continue;
+      if( !(pass_jet && pass_btag) ) continue;
+      var.push_back(e[i2]);
+    }
+    return var;
+}
+
+vector<float> compute_bm1(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp)
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      //if (!pass_jet) continue;
+      if( !(pass_jet && pass_btag) ) continue;
+      ROOT::Math::PtEtaPhiEVector p1(pt[i1], eta[i1], phi[i1], energy[i1]);
+      var.push_back(p1.M());
+    }
+    return var;
+}
+
+vector<float> compute_bm2(const RVec<RVec<size_t>> &idx, rvec_f pt, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f scale, rvec_f btag, rvec_f btag_wp)
+{
+    vector<float> var;
+    for( size_t i = 0; i < idx.size() ; i++){
+      const auto i1 = idx[i][0]; const auto i2 = idx[i][1];
+      bool pass_jet = pt[i1]*scale[i1] > 30 && abs(eta[i1]) < 2.4 && pt[i2]*scale[i2] > 30 && abs(eta[i2]) < 2.4;
+      bool pass_btag = btag[i1] > btag_wp[0] && btag[i2] > btag_wp[0];
+      //if (!pass_jet) continue;
+      if( !(pass_jet && pass_btag) ) continue;
+      ROOT::Math::PtEtaPhiEVector p2(pt[i2], eta[i2], phi[i2], energy[i2]);
+      var.push_back(p2.M());
+    }
+    return var;
+}
+
+float draw_mindR(rvec_f pt, rvec_f scale, rvec_f eta, rvec_f phi, rvec_f btag, rvec_f btag_wp)
 {
 
     float dR = 999;
@@ -226,7 +620,7 @@ float draw_mindR(rvec_f pt, rvec_f scale, rvec_f eta, rvec_f phi, rvec_f btag)
     for( int i = 0; i < pt.size()-1 ; i++){
       for( int j = i+1; j < pt.size() ; j++){
         bool pass_jet = pt[i]*scale[i] > 30 && abs(eta[i]) < 2.4 && pt[j]*scale[j] > 30 && abs(eta[j]) < 2.4;
-        bool pass_btag = btag[i] >  0.8484 && btag[j] > 0.8484;
+        bool pass_btag = btag[i] > btag_wp[0] && btag[j] > btag_wp[0];
         if( !(pass_jet && pass_btag) ) continue;
         float tmp = DeltaR(eta[i], eta[j], phi[i], phi[j]);
         if(tmp < dR) {
@@ -237,14 +631,14 @@ float draw_mindR(rvec_f pt, rvec_f scale, rvec_f eta, rvec_f phi, rvec_f btag)
     return dR;
 }
 
-float draw_mass(rvec_f pt, rvec_f scale, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f btag)
+float draw_mass(rvec_f pt, rvec_f scale, rvec_f eta, rvec_f phi, rvec_f energy, rvec_f btag, rvec_f btag_wp)
 {
     float dR = 999;
     float mbb = 999;
     for( int i = 0; i < pt.size()-1 ; i++){
       for( int j = i+1; j < pt.size() ; j++){
         bool pass_jet = pt[i]*scale[i] > 30 && abs(eta[i]) < 2.4 && pt[j]*scale[j] > 30 && abs(eta[j]) < 2.4;
-        bool pass_btag = btag[i] >  0.8484 && btag[j] > 0.8484;
+        bool pass_btag = btag[i] > btag_wp[0] && btag[j] > btag_wp[0];
         if( !(pass_jet && pass_btag) ) continue;
         float tmp = DeltaR(eta[i], eta[j], phi[i], phi[j]);
         if(tmp < dR) {
@@ -269,15 +663,14 @@ void plot(T sig, const std::string &name, const std::string &filename){
   c->SaveAs(filename.c_str());
 }
 
-void ana_rdf(TString year = "2018", TString CATver = "V10_2", TString name = "TTLJ_PowhegPythia_ttbb", TString ch = "0", TString dnn = "1"){
+void ana_rdf(TString year = "2018", TString CATver = "V10_3", TString name = "TTLJ_PowhegPythia_ttbb", TString ch = "0", TString dnn = "1"){
   // Enable multi-threading
   //ROOT::EnableImplicitMT();
 
-//  ROOT::RDataFrame df("ttbbLepJets/tree",Form("/cms/ldap_home/sarakm0704/public/ntuple/Run%s/%s/%s.root", year.Data(), CATver.Data(), name.Data()) ); //all
-  ROOT::RDataFrame df("ttbbLepJets/tree",Form("/xrootd/store/user/sarakm0704/ntuple/Run%s/%s/%s.root", year.Data(), CATver.Data(), name.Data()) ); //from xrootd
+  ROOT::RDataFrame df("ttbbLepJets/tree",Form("/cms/ldap_home/sarakm0704/public/ttbb/%s/sync/%s.root", CATver.Data(), name.Data()) ); //from local
 
 /*
-  TFile *f_info = new TFile(Form("/cms/ldap_home/sarakm0704/public/ntuple/Run2018/V10_2/%s.root", name.Data()));
+  TFile *f_info = new TFile(Form("/cms/ldap_home/sarakm0704/public/ttbb/%s/sync/%s.root", CATver.Data(), name.Data()));
   TH1D * EventInfo = (TH1D*) f_info->Get("ttbbLepJets/EventInfo");
   double n = EventInfo->GetBinContent(2);
   double Xsection = 1.0;
@@ -286,39 +679,39 @@ void ana_rdf(TString year = "2018", TString CATver = "V10_2", TString name = "TT
     Xsection = Xsections.find(name)->second ;
   } 
 */
+
   auto df_ch = df.Filter(Form("channel == %s", ch.Data()),"lepton channel");
 
   if( name.Contains("Data") ){
-    if ( year.Atoi() == 2016 ) df_ch = df_ch.Define("jet_scale","rvec_f(jet_pT.size(), 1.0f);");
-    else df_ch = df_ch.Define("jet_scale","rvec_f(jet_pt.size(), 1.0f);");
-
+    df_ch = df_ch.Define("jet_scale","rvec_f(jet_pt.size(), 1.0f);");
     df_ch = df_ch.Define("weight","1");
     df_ch = df_ch.Define("b_weight","1");
   }else{
+    //MC
     df_ch = df_ch.Define("jet_scale","jet_JER_Nom");
-
+    //event weight = genweight * puweight * lepton SF * b-tagging SF
     if ( ch.Atoi() == 0 ){
-      if ( year.Atoi() == 2016 ){
-        df_ch = df_ch.Define("weight","genweight*PUWeight[0]*lepton_SF[0]*lepton_SF[3]");
-        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*lepton_SF[0]*lepton_SF[3]*jet_SF_CSV_30[0]");
+      if ( year.Atoi() == 2016 ){ 
+        df_ch = df_ch.Define("weight","genweight*PUWeight[0]*prefireweigt[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]");// analyzer typo! need to be fixed
+        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*prefireweigt[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*jet_SF_deepJet_30[0]");
       }else if ( year.Atoi() == 2017 ){
         df_ch = df_ch.Define("weight","genweight*PUWeight[0]*prefireweight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]");
-        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*prefireweight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*jet_SF_deepCSV_30[0]");    
+        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*prefireweight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*jet_SF_deepJet_30[0]");    
       }else if (year.Atoi() == 2018 ){
         df_ch = df_ch.Define("weight","genweight*PUWeight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]");
-        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*jet_SF_deepCSV_30[0]");
+        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*jet_SF_deepJet_30[0]");
       }else cout << "Invalid year:: " << year.Data() << endl;
 
     }else if ( ch.Atoi() == 1 ){
       if ( year.Atoi() == 2016 ){
-        df_ch = df_ch.Define("weight","genweight*PUWeight[0]*lepton_SF[0]*lepton_SF[3]");
-        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*lepton_SF[0]*lepton_SF[3]*jet_SF_CSV_30[0]");
+        df_ch = df_ch.Define("weight","genweight*PUWeight[0]*prefireweigt[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*lepton_SF[9]");// analyzer typo! need to be fixed
+        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*prefireweigt[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*lepton_SF[9]*jet_SF_deepJet_30[0]");    
       }else if ( year.Atoi() == 2017 ){
         df_ch = df_ch.Define("weight","genweight*PUWeight[0]*prefireweight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*lepton_SF[9]");
-        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*prefireweight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*lepton_SF[9]*jet_SF_deepCSV_30[0]");    
+        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*prefireweight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*lepton_SF[9]*jet_SF_deepJet_30[0]");    
       }else if (year.Atoi() == 2018 ){
         df_ch = df_ch.Define("weight","genweight*PUWeight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]");
-        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*jet_SF_deepCSV_30[0]");
+        df_ch = df_ch.Define("b_weight","genweight*PUWeight[0]*lepton_SF[0]*lepton_SF[3]*lepton_SF[6]*jet_SF_deepJet_30[0]");
       }else cout << "Invalid year:: " << year.Data() << endl;
     }else cout << "Invalid channel:: " << ch.Data() << endl;
   }
@@ -328,19 +721,25 @@ void ana_rdf(TString year = "2018", TString CATver = "V10_2", TString name = "TT
   auto df_S1 = df_ch;
 
   if( year.Atoi() == 2016 ){
-    df_S1 = df_S1.Define("lepton_pt","lepton_pT")
-                 .Define("jet_pt","jet_pT")
-                 .Define("jet_e","jet_E")
-                 .Define("jet_deepCSV","jet_CSV");
+      if (ch.Atoi() == 0) df_S1 = df_S1.Filter("lepton_pt > 26 && abs(lepton_eta) < 2.4");
+      else if (ch.Atoi() == 1) df_S1 = df_S1.Filter("lepton_pt > 29 && abs(lepton_eta) < 2.4");
+      df_S1 = df_S1.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.3093f);");
 
-    if (ch.Atoi() == 0) df_S1 = df_S1.Filter("lepton_pt > 30 && abs(lepton_eta) < 2.1");
-    else if (ch.Atoi() == 1) df_S1 = df_S1.Filter("lepton_pt > 35 && abs(lepton_eta) < 2.1");
-  }else{ //2017, 2018
-     df_S1 = df_S1.Filter("lepton_pt > 30 && abs(lepton_eta) < 2.4");
+  }else if (year.Atoi() == 2017){ 
+      if (ch.Atoi() == 0) df_S1 = df_S1.Filter("lepton_pt > 29 && abs(lepton_eta) < 2.4");
+      else if (ch.Atoi() == 1) df_S1 = df_S1.Filter("(lepton_pt > 34 && abs(lepton_eta) < 2.4) || (lepton_pt > 30 && abs(lepton_eta) < 2.1)");
+      df_S1 = df_S1.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.3033f);");
+
+  }else if (year.Atoi() == 2018){ 
+      if (ch.Atoi() == 0) df_S1 = df_S1.Filter("lepton_pt > 26 && abs(lepton_eta) < 2.4");
+      else if (ch.Atoi() == 1) df_S1 = df_S1.Filter("(lepton_pt > 34 && abs(lepton_eta) < 2.4) || (lepton_pt > 30 && abs(lepton_eta) < 2.1)");
+      df_S1 = df_S1.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.2770f);");
   }
 
-  df_S1 = df_S1.Filter("Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4) >= 1", "Events with one lepton and one jet")
-               .Define("njets","Sum(jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4)");
+  //step1
+  // 1 lep 1 jet
+  df_S1 = df_S1.Filter("Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 ) >= 1", "Events with one lepton and one jet")
+               .Define("njets","Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 )");
   
   auto h_njets_S1 = df_S1.Histo1D({"h_njets_S1", "", 5, 0, 5}, "njets","weight");
   auto h_lepton_pt_S1 = df_S1.Define("Lepton_pT","lepton_pt").Histo1D({"h_lepton_pt_S1","",20,0,400},"Lepton_pT","weight");
@@ -348,13 +747,17 @@ void ana_rdf(TString year = "2018", TString CATver = "V10_2", TString name = "TT
   auto h_lepton_phi_S1 = df_S1.Define("Lepton_Phi","lepton_phi").Histo1D({"h_lepton_phi_S1","",40,-3.5,3.5},"Lepton_Phi","weight");
 
   //step2
-  auto df_S2 = df_S1.Filter("Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4) >= 6", "Events with at least six jets");   
+  // 1 lep 4 jet 2 b-tagged
+  auto df_S2 = df_S1.Filter("Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 ) >= 4", "Events with at least 4 jets")
+                    .Filter("Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 && jet_deepJet > BTAG_deepJet_M ) >= 2","Require 2 jets to be b-tagged");   
   df_S2 = df_S2.Define("jet_idx",jet_idx,{"jet_pt","jet_eta","jet_scale"})
-               .Define("nbjets","Sum(jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 && jet_deepCSV > 0.8484)");  //2016 CSVv2M
-//               .Define("nbjets","Sum(jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 && jet_deepCSV > 0.7527)"); //2018 DeepCSVT
-//               .Define("nbjets","Sum(jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 && jet_deepCSV > 0.8001)"); //2017 DeepCSVT
+               .Define("nbjets","Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 && jet_deepJet > BTAG_deepJet_M )");
 
-  auto h_nbjets_S2 = df_S2.Histo1D({"h_nbjets_S2", "", 5, 0, 5}, "nbjets","weight");
+  auto h_njets_S2 = df_S2.Histo1D({"h_njets_S2", "", 6, 4, 10}, "njets","b_weight");
+  auto h_nbjets_S2 = df_S2.Histo1D({"h_nbjets_S2", "", 3, 2, 5}, "nbjets","b_weight");
+  auto h_lepton_pt_S2 = df_S2.Define("Lepton_pT","lepton_pt").Histo1D({"h_lepton_pt_S2","",20,0,400},"Lepton_pT","b_weight");
+  auto h_lepton_eta_S2 = df_S2.Define("Lepton_Eta","abs(lepton_eta)").Histo1D({"h_lepton_eta_S2","",20,0,2.5},"Lepton_Eta","b_weight");
+  auto h_lepton_phi_S2 = df_S2.Define("Lepton_Phi","lepton_phi").Histo1D({"h_lepton_phi_S2","",40,-3.5,3.5},"Lepton_Phi","b_weight");
   auto h_jet1_pt_S2 = df_S2.Define("jet1_pT","jet_pt[jet_idx[0]]*jet_scale[jet_idx[0]]").Histo1D({"h_jet1_pt_S2","",20,0,400},"jet1_pT","weight");
   auto h_jet1_eta_S2 = df_S2.Define("jet1_Eta","abs(jet_eta[jet_idx[0]])").Histo1D({"h_jet1_eta_S2","",20,0,2.5},"jet1_Eta","weight");
   auto h_jet2_pt_S2 = df_S2.Define("jet2_pT","jet_pt[jet_idx[1]]*jet_scale[jet_idx[1]]").Histo1D({"h_jet2_pt_S2","",20,0,400},"jet2_pT","weight");
@@ -364,70 +767,110 @@ void ana_rdf(TString year = "2018", TString CATver = "V10_2", TString name = "TT
   auto h_jet4_pt_S2 = df_S2.Define("jet4_pT","jet_pt[jet_idx[3]]*jet_scale[jet_idx[3]]").Histo1D({"h_jet4_pt_S2","",20,0,400},"jet4_pT","weight");
   auto h_jet4_eta_S2 = df_S2.Define("jet4_Eta","abs(jet_eta[jet_idx[3]])").Histo1D({"h_jet4_eta_S2","",20,0,2.5},"jet4_Eta","weight");
 
-  if( dnn.Atoi() == true ){
-//    df_S3 = df_S3.Define("jet_combi_idx", jet_combi, {"jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepCSV"})
-      df_S2 = df_S2.Define("jet_combi_idx", jet_combi_border, {"jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepCSV"}) //sort as b-discrimminator order
-                 .Define("mbb", compute_mass, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepCSV"})
-                 .Define("dRbb", compute_dR, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepCSV"})
-
-                 .Define("pt1", compute_bpt1, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepCSV"})
-                 .Define("pt2", compute_bpt2, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepCSV"})
-
-                 .Define("bt1", compute_bt1, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepCSV"})
-                 .Define("bt2", compute_bt2, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepCSV"})
-
-                 .Define("eta1", compute_beta1, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepCSV"})
-                 .Define("eta2", compute_beta2, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepCSV"});
-
-    df_S2.Snapshot("dnn_tree", Form("dnn_tree/dnn_%s_Ch%s.root", name.Data(), ch.Data()), {"event","mbb","dRbb","b_weight","pt1","eta1","pt2","eta2","bt1","bt2"});
-
-    if( name.Contains("ttbb") ){
-      df_S2 = df_S2.Define("signal", signal_label, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepCSV","addbjet1_eta","addbjet1_phi","addbjet2_eta","addbjet2_phi"});
-      df_S2.Snapshot("dnn_tree", Form("dnn_tree/dnn_%s_Ch%s.root", name.Data(), ch.Data()), {"event","signal","mbb","dRbb","b_weight","pt1","eta1","pt2","eta2","bt1","bt2"});
-    }
-  }
   //step3
-  //select b-tagged jets with DeepCSV tagging at tight working point of 0.7527(2018), 0.8001(2017), medium 0.8484(2016ReReco)
-  //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation 
-//  auto df_S3 = df_S2.Filter("Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 && jet_deepCSV >  0.7527) >=3","Require 3 jets to be b-tagged");  //2018 DeepCSVT
-//  auto df_S3 = df_S2.Filter("Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 && jet_deepCSV >  0.8001) >=3","Require 3 jets to be b-tagged");  //2017 DeepCSVT
-  auto df_S3 = df_S2.Filter("Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 && jet_deepCSV > 0.8484) >=4","Require 4 jets to be b-tagged");  //2016 CSVv2M
+  // 1 lep 6 jet 2 b-tagged
+  auto df_S3 = df_S2.Filter("Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 ) >= 6","Require 6 jets");
 
-  df_S3 = df_S3.Define("bjet_idx",bjet_idx,{"jet_pt","jet_eta","jet_scale","jet_deepCSV"})
-               .Define("min_Mass", draw_mass, {"jet_pt","jet_scale","jet_eta","jet_phi","jet_e","jet_deepCSV"})
-               .Define("min_dR", draw_mindR, {"jet_pt","jet_scale","jet_eta","jet_phi","jet_deepCSV"});
+  auto h_nbjets_S3 = df_S3.Histo1D({"h_nbjets_S3", "", 3, 2, 5}, "nbjets","b_weight");
+  auto h_lepton_pt_S3 = df_S3.Define("Lepton_pT","lepton_pt").Histo1D({"h_lepton_pt_S3","",20,0,400},"Lepton_pT","b_weight");
+  auto h_lepton_eta_S3 = df_S3.Define("Lepton_Eta","abs(lepton_eta)").Histo1D({"h_lepton_eta_S3","",20,0,2.5},"Lepton_Eta","b_weight");
+  auto h_lepton_phi_S3 = df_S3.Define("Lepton_Phi","lepton_phi").Histo1D({"h_lepton_phi_S3","",40,-3.5,3.5},"Lepton_Phi","b_weight");
+  auto h_jet1_pt_S3 = df_S3.Define("jet1_pT","jet_pt[jet_idx[0]]*jet_scale[jet_idx[0]]").Histo1D({"h_jet1_pt_S3","",20,0,400},"jet1_pT","weight");
+  auto h_jet1_eta_S3 = df_S3.Define("jet1_Eta","abs(jet_eta[jet_idx[0]])").Histo1D({"h_jet1_eta_S3","",20,0,2.5},"jet1_Eta","weight");
+  auto h_jet2_pt_S3 = df_S3.Define("jet2_pT","jet_pt[jet_idx[1]]*jet_scale[jet_idx[1]]").Histo1D({"h_jet2_pt_S3","",20,0,400},"jet2_pT","weight");
+  auto h_jet2_eta_S3 = df_S3.Define("jet2_Eta","abs(jet_eta[jet_idx[1]])").Histo1D({"h_jet2_eta_S3","",20,0,2.5},"jet2_Eta","weight");
+  auto h_jet3_pt_S3 = df_S3.Define("jet3_pT","jet_pt[jet_idx[2]]*jet_scale[jet_idx[2]]").Histo1D({"h_jet3_pt_S3","",20,0,400},"jet3_pT","weight");
+  auto h_jet3_eta_S3 = df_S3.Define("jet3_Eta","abs(jet_eta[jet_idx[2]])").Histo1D({"h_jet3_eta_S3","",20,0,2.5},"jet3_Eta","weight");
+  auto h_jet4_pt_S3 = df_S3.Define("jet4_pT","jet_pt[jet_idx[3]]*jet_scale[jet_idx[3]]").Histo1D({"h_jet4_pt_S3","",20,0,400},"jet4_pT","weight");
+  auto h_jet4_eta_S3 = df_S3.Define("jet4_Eta","abs(jet_eta[jet_idx[3]])").Histo1D({"h_jet4_eta_S3","",20,0,2.5},"jet4_Eta","weight");
 
-  auto h_minMass_S3 = df_S3.Histo1D({"h_minMass_S3","",20,0,400},"min_Mass","b_weight");
-  auto h_mindR_S3 = df_S3.Histo1D({"h_mindR_S3","",20,0,4},"min_dR","b_weight");
+  //step4
+  // 1 lep 6 jet 4 b-tagged
 
-  auto h_bjet1_pt_S3 = df_S3.Define("bjet1_pT","jet_pt[bjet_idx[0]]*jet_scale[bjet_idx[0]]").Histo1D({"h_bjet1_pt_S3","",20,0,400},"bjet1_pT","b_weight");
-  auto h_bjet2_pt_S3 = df_S3.Define("bjet2_pT","jet_pt[bjet_idx[1]]*jet_scale[bjet_idx[1]]").Histo1D({"h_bjet2_pt_S3","",20,0,400},"bjet2_pT","b_weight");
+  auto df_S4 = df_S3.Filter("Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 && jet_deepJet > BTAG_deepJet_M ) >= 4","Require 4 jets to be b-tagged");
+  df_S4 = df_S4.Define("bjet_idx",bjet_idx,{"jet_pt","jet_eta","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+               .Define("min_Mass", draw_mass, {"jet_pt","jet_scale","jet_eta","jet_phi","jet_e","jet_deepJet","BTAG_deepJet_M"})
+               .Define("min_dR", draw_mindR, {"jet_pt","jet_scale","jet_eta","jet_phi","jet_deepJet","BTAG_deepJet_M"});
+
+  auto h_lepton_pt_S4 = df_S4.Define("Lepton_pT","lepton_pt").Histo1D({"h_lepton_pt_S4","",20,0,400},"Lepton_pT","b_weight");
+  auto h_lepton_eta_S4 = df_S4.Define("Lepton_Eta","abs(lepton_eta)").Histo1D({"h_lepton_eta_S4","",20,0,2.5},"Lepton_Eta","b_weight");
+  auto h_lepton_phi_S4 = df_S4.Define("Lepton_Phi","lepton_phi").Histo1D({"h_lepton_phi_S4","",40,-3.5,3.5},"Lepton_Phi","b_weight");
+  auto h_minMass_S4 = df_S4.Histo1D({"h_minMass_S4","",20,0,400},"min_Mass","b_weight");
+  auto h_mindR_S4 = df_S4.Histo1D({"h_mindR_S4","",20,0,4},"min_dR","b_weight");
+  auto h_bjet1_pt_S4 = df_S4.Define("bjet1_pT","jet_pt[bjet_idx[0]]*jet_scale[bjet_idx[0]]").Histo1D({"h_bjet1_pt_S4","",20,0,400},"bjet1_pT","b_weight");
+  auto h_bjet2_pt_S4 = df_S4.Define("bjet2_pT","jet_pt[bjet_idx[1]]*jet_scale[bjet_idx[1]]").Histo1D({"h_bjet2_pt_S4","",20,0,400},"bjet2_pT","b_weight");
 
 //instant number?
-//  df_var = df_S3.Define("number","rvec_f(jet_pt.size(), 1.0f);").Define("test1", compute_var, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepCSV","number"});
+//  df_var = df_S3.Define("number","rvec_f(jet_pt.size(), 1.0f);").Define("test1", compute_var, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","number"});
 
   //for DNN
+  if( dnn.Atoi() == true ){
+      df_S4 = df_S4.Define("jet_combi_idx", jet_combi, {"jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("mbb", compute_mass, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("dRbb", compute_dR, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("dPhibb", compute_dPhi, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("dEtabb", compute_dEta, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("Etabb", compute_Eta, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("Phibb", compute_Phi, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M"})
 
-//    auto h_mbb_S3 = df_S3.Histo1D({"h_mbb_S3", "", 10, 70, 170}, "mbb", "b_weight");
-//    auto h_dRbb_S3 = df_S3.Histo1D({"h_dRbb_S3", "", 20 , 0, 4}, "dRbb", "b_weight");
+                 .Define("mlb1", compute_masslb1, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M","lepton_pt","lepton_eta","lepton_phi","lepton_e"})
+                 .Define("mlb2", compute_masslb2, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M","lepton_pt","lepton_eta","lepton_phi","lepton_e"})
+                 .Define("dRlb1", compute_dRlb1, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","BTAG_deepJet_M","lepton_eta","lepton_phi"})
+                 .Define("dRlb2", compute_dRlb2, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","BTAG_deepJet_M","lepton_eta","lepton_phi"})
 
-//  //scale histogram 
-//  h_njets_S1->Scale();
-//  h_lepton_pt_S1->Scale();
-//  h_lepton_eta_S1->Scale();
-//  h_lepton_phi_S1->Scale();
-//  h_nbjets_S2->Scale();
-//  h_jet_pt_S2->Scale();
-//  h_jet_eta_S2->Scale();
-//  h_jet_phi_S2->Scale();
+                 .Define("mlbb", compute_masslbb, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M","lepton_pt","lepton_eta","lepton_phi","lepton_e"})
+                 .Define("dRlbb", compute_dRlbb, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M","lepton_eta","lepton_phi"})
+
+                 .Define("mnub1", compute_massnub1, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M","MET","MET_phi"})
+                 .Define("mnub2", compute_massnub2, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M","MET","MET_phi"})
+                 .Define("dRnub1", compute_dRnub1, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","BTAG_deepJet_M","MET_phi"})
+                 .Define("dRnub2", compute_dRnub2, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","BTAG_deepJet_M","MET_phi"})
+
+                 .Define("mnubb", compute_massnubb, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M","MET","MET_phi"})
+                 .Define("dRnubb", compute_dRnubb, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M","MET_phi"})
+
+                 .Define("dRlnubb", compute_dRlnubb, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M","lepton_pt","lepton_eta","lepton_phi","lepton_e","MET","MET_phi"})
+                 .Define("dRlnub1", compute_dRlnub1, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","BTAG_deepJet_M","lepton_pt","lepton_eta","lepton_phi","lepton_e","MET","MET_phi"})
+                 .Define("dRlnub2", compute_dRlnub2, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","BTAG_deepJet_M","lepton_pt","lepton_eta","lepton_phi","lepton_e","MET","MET_phi"})
+
+                 .Define("pt1", compute_bpt1, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("pt2", compute_bpt2, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+
+                 .Define("d1", compute_d1, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("d2", compute_d2, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+
+                 .Define("eta1", compute_beta1, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("eta2", compute_beta2, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("phi1", compute_bphi1, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("phi2", compute_bphi2, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+
+                 .Define("e1", compute_be1, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepJet","BTAG_deepJet_M", "jet_e"})
+                 .Define("e2", compute_be2, {"jet_combi_idx","jet_pt","jet_eta","jet_scale","jet_deepJet","BTAG_deepJet_M", "jet_e"})
+
+                 .Define("m1", compute_bm1, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M"})
+                 .Define("m2", compute_bm2, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_e","jet_scale","jet_deepJet","BTAG_deepJet_M"});
+
+    df_S4.Snapshot("dnn_tree", Form("dnn_tree/dnn_%s_Ch%s.root", name.Data(), ch.Data()), {"event","mbb","dRbb","dPhibb","dEtabb","Etabb","Phibb","mlbb","dRlbb","mlb1","dRlb1","mlb2","dRlb2","mnubb","dRnubb","mnub1","dRnub1","mnub2","dRnub2","dRlnubb","dRlnub1","dRlnub2","b_weight","nbjets","pt1","eta1","phi1","e1","pt2","eta2","phi2","e2","d1","d2","m1","m2","lepton_pt","lepton_eta","lepton_phi","lepton_e","MET","MET_phi"});
+
+    if( name.Contains("ttbb") ){
+      df_S4 = df_S4.Define("signal", signal_label, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","BTAG_deepJet_M","addbjet1_eta","addbjet1_phi","addbjet2_eta","addbjet2_phi"});
+      df_S4.Snapshot("dnn_tree", Form("dnn_tree/dnn_%s_Ch%s.root", name.Data(), ch.Data()), {"event","signal","mbb","dRbb","dPhibb","dEtabb","Etabb","Phibb","mlbb","dRlbb","mlb1","dRlb1","mlb2","dRlb2","mnubb","dRnubb","mnub1","dRnub1","mnub2","dRnub2","dRlnubb","dRlnub1","dRlnub2","b_weight","nbjets","pt1","eta1","phi1","e1","pt2","eta2","phi2","e2","d1","d2","m1","m2","lepton_pt","lepton_eta","lepton_phi","lepton_e","MET","MET_phi","addbjet1_pt","addbjet1_eta","addbjet1_phi","addbjet1_e","addbjet2_pt","addbjet2_eta","addbjet2_phi","addbjet2_e"});
+    }
+  }
 
   //create ntuple
   TFile f(Form("hist/hist_%s_Ch%s.root", name.Data(), ch.Data()),"recreate");
+
   h_njets_S1->Write();
   h_lepton_pt_S1->Write();
   h_lepton_eta_S1->Write();
   h_lepton_phi_S1->Write();
+
+  h_njets_S2->Write();
   h_nbjets_S2->Write();
+  h_lepton_pt_S2->Write();
+  h_lepton_eta_S2->Write();
+  h_lepton_phi_S2->Write();
   h_jet1_pt_S2->Write();
   h_jet1_eta_S2->Write();
   h_jet2_pt_S2->Write();
@@ -436,10 +879,28 @@ void ana_rdf(TString year = "2018", TString CATver = "V10_2", TString name = "TT
   h_jet3_eta_S2->Write();
   h_jet4_pt_S2->Write();
   h_jet4_eta_S2->Write();
-  h_bjet1_pt_S3->Write();
-  h_bjet2_pt_S3->Write();
-  h_mindR_S3->Write();
-  h_minMass_S3->Write();
+
+  h_nbjets_S3->Write();
+  h_lepton_pt_S3->Write();
+  h_lepton_eta_S3->Write();
+  h_lepton_phi_S3->Write();
+  h_jet1_pt_S3->Write();
+  h_jet1_eta_S3->Write();
+  h_jet2_pt_S3->Write();
+  h_jet2_eta_S3->Write();
+  h_jet3_pt_S3->Write();
+  h_jet3_eta_S3->Write();
+  h_jet4_pt_S3->Write();
+  h_jet4_eta_S3->Write();
+
+  h_lepton_pt_S4->Write();
+  h_lepton_eta_S4->Write();
+  h_lepton_phi_S4->Write();
+  h_bjet1_pt_S4->Write();
+  h_bjet2_pt_S4->Write();
+  h_mindR_S4->Write();
+  h_minMass_S4->Write();
+
   f.Close();
 
   //count number of events
@@ -447,11 +908,8 @@ void ana_rdf(TString year = "2018", TString CATver = "V10_2", TString name = "TT
   auto n_df_S1 = df_S1.Count();
   auto n_df_S2 = df_S2.Count();
   auto n_df_S3 = df_S3.Count();
+  auto n_df_S4 = df_S4.Count();
 
-  std::cout << Form("Sample = %s, Ch=%s : number of events = ", name.Data(), ch.Data()) << *n_df << " , preselection(S1) = " << *n_df_S1 <<  " , S2 = " << *n_df_S2 << ", final selection(S3) = " << *n_df_S3 << std::endl;
-
-  //plotting 
- // plot(h_nbtag, "ttbb_nbtag", "h_nbtag.pdf");
- // plot(h_njets, "ttbb_njets", "h_njets.pdf");
+  std::cout << Form("Sample = %s, Ch=%s : number of events = ", name.Data(), ch.Data()) << *n_df << " , preselection(S1) = " << *n_df_S1 <<  " , S2 = " << *n_df_S2 << " , S3 = "  << *n_df_S3 << " , final selection(S4) = " << *n_df_S4 << std::endl;
 
 }
