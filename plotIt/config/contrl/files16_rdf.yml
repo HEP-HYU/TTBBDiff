@@ -1,0 +1,1380 @@
+
+'root16/hist_TTLJ_PowhegPythia_ttbj_Ch0.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythia_ttbj'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#660000'
+  group: Gttbj
+  order: 1
+
+'root16/hist_TTLJ_PowhegPythia_ttother_Ch0.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythia_ttother'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 4
+
+'root16/hist_W2JetsToLNu_MadgraphPythia_part1_Ch0.root':
+  type: mc
+  pretty-name: 'W2JetsToLNu_MadgraphPythia_part1'
+  cross-section: 2793
+  generated-events: 30064264.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 25
+
+'root16/hist_W3JetsToLNu_MadgraphPythia_part1_Ch0.root':
+  type: mc
+  pretty-name: 'W3JetsToLNu_MadgraphPythia_part1'
+  cross-section: 992.5
+  generated-events: 19798117.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 26
+
+'root16/hist_W4JetsToLNu_MadgraphPythia_part1_Ch0.root':
+  type: mc
+  pretty-name: 'W4JetsToLNu_MadgraphPythia_part1'
+  cross-section: 544.3
+  generated-events: 9116657.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 27
+
+'root16/hist_W4JetsToLNu_MadgraphPythia_part3_Ch0.root':
+  type: mc
+  pretty-name: 'W4JetsToLNu_MadgraphPythia_part3'
+  cross-section: 544.3
+  generated-events: 18751462.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 27
+
+'root16/hist_WW_Pythia_part2_Ch0.root':
+  type: mc
+  pretty-name: 'WW_Pythia_part2'
+  cross-section: 118.7
+  generated-events: 6843148.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 19
+
+'root16/hist_WZ_Pythia_part2_Ch0.root':
+  type: mc
+  pretty-name: 'WZ_Pythia_part2'
+  cross-section: 47.13
+  generated-events: 2997571.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 20
+
+'root16/hist_ZJets_M10to50_MadgraphPythia_part2_Ch0.root':
+  type: mc
+  pretty-name: 'ZJets_M10to50_MadgraphPythia_part2'
+  cross-section: 18610.0
+  generated-events: 29374008.0
+  fill-color: '#000099'
+  group: GZJets
+  order: 23
+
+'root16/hist_ZZ_Pythia_part1_Ch0.root':
+  type: mc
+  pretty-name: 'ZZ_Pythia_part1'
+  cross-section: 16.523
+  generated-events: 990064.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 21
+
+'root16/hist_ttHToNonbb_PowhegPythia_Ch0.root':
+  type: mc
+  pretty-name: 'ttHToNonbb_PowhegPythia'
+  cross-section: 0.2151
+  generated-events: 9757039.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 9
+
+'root16/hist_ttWToLNu_aMCatNLOMadspinPythia_part1_Ch0.root':
+  type: mc
+  pretty-name: 'ttWToLNu_aMCatNLOMadspinPythia_part1'
+  cross-section: 0.2043
+  generated-events: 1112722.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 11
+
+'root16/hist_ttWToQQ_aMCatNLOMadspinPythia_Ch0.root':
+  type: mc
+  pretty-name: 'ttWToQQ_aMCatNLOMadspinPythia'
+  cross-section: 0.4062
+  generated-events: 430310.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 10
+
+'root16/hist_ttZToLLNuNu_aMCatNLOMadspinPythia_part2_Ch0.root':
+  type: mc
+  pretty-name: 'ttZToLLNuNu_aMCatNLOMadspinPythia_part2'
+  cross-section: 0.2529
+  generated-events: 2723203.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 13
+
+'root16/hist_ttZToQQ_aMCatNLOMadspinPythia_Ch0.root':
+  type: mc
+  pretty-name: 'ttZToQQ_aMCatNLOMadspinPythia'
+  cross-section: 0.5297
+  generated-events: 351164.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 12
+
+'root16/hist_DataSingleMuB_Ch0.root':
+  type: data
+  pretty-name: 'DataSingleMuB'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleMuC_Ch0.root':
+  type: data
+  pretty-name: 'DataSingleMuC'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleMuD_Ch0.root':
+  type: data
+  pretty-name: 'DataSingleMuD'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleMuE_Ch0.root':
+  type: data
+  pretty-name: 'DataSingleMuE'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleMuF_Ch0.root':
+  type: data
+  pretty-name: 'DataSingleMuF'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleMuG_Ch0.root':
+  type: data
+  pretty-name: 'DataSingleMuG'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleMuH_Ch0.root':
+  type: data
+  pretty-name: 'DataSingleMuH'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_QCD_Pt-1000toInf_MuEnriched_part1_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-1000toInf_MuEnriched_part1'
+  cross-section: 1.62131692
+  generated-events: 3939725.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 38
+
+'root16/hist_QCD_Pt-1000toInf_MuEnriched_part2_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-1000toInf_MuEnriched_part2'
+  cross-section: 1.62131692
+  generated-events: 9638102.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 38
+
+'root16/hist_QCD_Pt-120to170_EMEnriched_part1_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-120to170_EMEnriched_part1'
+  cross-section: 62964.0
+  generated-events: 36015016.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 44
+
+'root16/hist_QCD_Pt-120to170_EMEnriched_part2_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-120to170_EMEnriched_part2'
+  cross-section: 62964.0
+  generated-events: 42563399.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 44
+
+'root16/hist_QCD_Pt-120to170_MuEnriched_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-120to170_MuEnriched'
+  cross-section: 25190.51514
+  generated-events: 7897731.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 33
+
+'root16/hist_QCD_Pt-15to20_MuEnriched_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-15to20_MuEnriched'
+  cross-section: 3819570.0
+  generated-events: 4141251.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 29
+
+'root16/hist_QCD_Pt-170to300_EMEnriched_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-170to300_EMEnriched'
+  cross-section: 18810.0
+  generated-events: 11540163.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 45
+
+'root16/hist_QCD_Pt-170to300_MuEnriched_part1_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-170to300_MuEnriched_part1'
+  cross-section: 8654.49315
+  generated-events: 7947159.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 34
+
+'root16/hist_QCD_Pt-170to300_MuEnriched_part2_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-170to300_MuEnriched_part2'
+  cross-section: 8654.49315
+  generated-events: 9403072.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 34
+
+'root16/hist_QCD_Pt-20to30_EMEnriched_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-20to30_EMEnriched'
+  cross-section: 5352960.0
+  generated-events: 9241500.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 40
+
+'root16/hist_QCD_Pt-20to30_MuEnriched_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-20to30_MuEnriched'
+  cross-section: 2960198.4
+  generated-events: 31878740.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 30
+
+'root16/hist_QCD_Pt-300to470_MuEnriched_part1_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-300to470_MuEnriched_part1'
+  cross-section: 797.35269
+  generated-events: 7937590.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 35
+
+'root16/hist_QCD_Pt-300to470_MuEnriched_part2_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-300to470_MuEnriched_part2'
+  cross-section: 797.35269
+  generated-events: 16462878.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 35
+
+'root16/hist_QCD_Pt-300to470_MuEnriched_part3_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-300to470_MuEnriched_part3'
+  cross-section: 797.35269
+  generated-events: 24605508.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 35
+
+'root16/hist_QCD_Pt-300toInf_EMEnriched_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-300toInf_EMEnriched'
+  cross-section: 1350.0
+  generated-events: 7380341.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 46
+
+'root16/hist_QCD_Pt-30to50_EMEnriched_part1_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-30to50_EMEnriched_part1'
+  cross-section: 9928000.0
+  generated-events: 4736443.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 41
+
+'root16/hist_QCD_Pt-30to50_EMEnriched_part2_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-30to50_EMEnriched_part2'
+  cross-section: 9928000.0
+  generated-events: 6772399.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 41
+
+'root16/hist_QCD_Pt-470to600_MuEnriched_part1_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-470to600_MuEnriched_part1'
+  cross-section: 79.02553776
+  generated-events: 3972819.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 36
+
+'root16/hist_QCD_Pt-470to600_MuEnriched_part2_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-470to600_MuEnriched_part2'
+  cross-section: 79.02553776
+  generated-events: 5668793.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 36
+
+'root16/hist_QCD_Pt-470to600_MuEnriched_part3_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-470to600_MuEnriched_part3'
+  cross-section: 79.02553776
+  generated-events: 9847664.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 36
+
+'root16/hist_QCD_Pt-50to80_EMEnriched_part1_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-50to80_EMEnriched_part1'
+  cross-section: 2890800.0
+  generated-events: 22455794.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 42
+
+'root16/hist_QCD_Pt-50to80_EMEnriched_part2_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-50to80_EMEnriched_part2'
+  cross-section: 2890800.0
+  generated-events: 23333265.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 42
+
+'root16/hist_QCD_Pt-50to80_MuEnriched_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-50to80_MuEnriched'
+  cross-section: 437504.1
+  generated-events: 19662175.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 31
+
+'root16/hist_QCD_Pt-600to800_MuEnriched_part1_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-600to800_MuEnriched_part1'
+  cross-section: 25.09505908
+  generated-events: 4010136.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 37
+
+'root16/hist_QCD_Pt-600to800_MuEnriched_part2_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-600to800_MuEnriched_part2'
+  cross-section: 25.09505908
+  generated-events: 5971175.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 37
+
+'root16/hist_QCD_Pt-800to1000_MuEnriched_part1_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-800to1000_MuEnriched_part1'
+  cross-section: 4.707368272
+  generated-events: 3962749.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 37
+
+'root16/hist_QCD_Pt-800to1000_MuEnriched_part2_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-800to1000_MuEnriched_part2'
+  cross-section: 4.707368272
+  generated-events: 6011849.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 37
+
+'root16/hist_QCD_Pt-800to1000_MuEnriched_part3_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-800to1000_MuEnriched_part3'
+  cross-section: 4.707368272
+  generated-events: 9966149.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 37
+
+'root16/hist_QCD_Pt-80to120_EMEnriched_part1_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-80to120_EMEnriched_part1'
+  cross-section: 350000.0
+  generated-events: 35926841.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 43
+
+'root16/hist_QCD_Pt-80to120_EMEnriched_part2_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-80to120_EMEnriched_part2'
+  cross-section: 350000.0
+  generated-events: 41873363.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 43
+
+'root16/hist_QCD_Pt-80to120_MuEnriched_part1_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-80to120_MuEnriched_part1'
+  cross-section: 106033.6648
+  generated-events: 13750713.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 32
+
+'root16/hist_QCD_Pt-80to120_MuEnriched_part2_Ch0.root':
+  type: mc
+  pretty-name: 'QCD_Pt-80to120_MuEnriched_part2'
+  cross-section: 106033.6648
+  generated-events: 9809949.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 32
+
+'root16/hist_SingleTbar_tW_PowhegPythia_Ch0.root':
+  type: mc
+  pretty-name: 'SingleTbar_tW_PowhegPythia'
+  cross-section: 35.85
+  generated-events: 4942374.0
+  fill-color: '#990099'
+  group: GSingleT
+  order: 18
+
+'root16/hist_SingleTbar_t_PowhegPythia_Ch0.root':
+  type: mc
+  pretty-name: 'SingleTbar_t_PowhegPythia'
+  cross-section: 80.95
+  generated-events: 17780700.0
+  fill-color: '#990099'
+  group: GSingleT
+  order: 17
+
+'root16/hist_SingleTop_s_aMCatNLOPythia_Ch0.root':
+  type: mc
+  pretty-name: 'SingleTop_s_aMCatNLOPythia'
+  cross-section: 3.36
+  generated-events: 6137801.0
+  fill-color: '#990099'
+  group: GSingleT
+  order: 16
+
+'root16/hist_SingleTop_tW_PowhegPythia_Ch0.root':
+  type: mc
+  pretty-name: 'SingleTop_tW_PowhegPythia'
+  cross-section: 35.85
+  generated-events: 4945734.0
+  fill-color: '#990099'
+  group: GSingleT
+  order: 15
+
+'root16/hist_SingleTop_t_PowhegPythia_Ch0.root':
+  type: mc
+  pretty-name: 'SingleTop_t_PowhegPythia'
+  cross-section: 136.02
+  generated-events: 31848000.0
+  fill-color: '#990099'
+  group: GSingleT
+  order: 14
+
+'root16/hist_TTJJ_PowhegPythiaBkg_Ch0.root':
+  type: mc
+  pretty-name: 'TTJJ_PowhegPythiaBkg'
+  cross-section: 377.96
+  generated-events: 67963984.0
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 7
+
+'root16/hist_TTLJ_PowhegPythiaBkg_Ch0.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythiaBkg'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 6
+
+'root16/hist_TTLJ_PowhegPythia_ttLF_Ch0.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythia_ttLF'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#cc0000'
+  group: GttLF
+  order: 3
+
+'root16/hist_TTLJ_PowhegPythia_ttbb_Ch0.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythia_ttbb'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#330000'
+  group: Gttbb
+  order: 0
+
+#'root16/hist_TTLJ_PowhegPythia_ttbbFilter_Ch0.root':
+#  type: mc
+#  pretty-name: 'TTLJ_PowhegPythia_ttbbFilter'
+#  cross-section: 365.34
+#  generated-events: 22572864.0
+#  fill-color: '#330000'
+#  group: Gttbb
+#  order: 0
+
+'root16/hist_TTLJ_PowhegPythia_ttcc_Ch0.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythia_ttcc'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#990000'
+  group: Gttcc
+  order: 2
+
+'root16/hist_TTLL_PowhegPythiaBkg_Ch0.root':
+  type: mc
+  pretty-name: 'TTLL_PowhegPythiaBkg'
+  cross-section: 88.29
+  generated-events: 67312164.0
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 5
+
+'root16/hist_W1JetsToLNu_MadgraphPythia_Ch0.root':
+  type: mc
+  pretty-name: 'W1JetsToLNu_MadgraphPythia'
+  cross-section: 9625
+  generated-events: 45283121.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 24
+
+'root16/hist_W2JetsToLNu_MadgraphPythia_part2_Ch0.root':
+  type: mc
+  pretty-name: 'W2JetsToLNu_MadgraphPythia_part2'
+  cross-section: 2793
+  generated-events: 30374504.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 25
+
+'root16/hist_W3JetsToLNu_MadgraphPythia_part2_Ch0.root':
+  type: mc
+  pretty-name: 'W3JetsToLNu_MadgraphPythia_part2'
+  cross-section: 992.5
+  generated-events: 39501912.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 26
+
+'root16/hist_W4JetsToLNu_MadgraphPythia_part2_Ch0.root':
+  type: mc
+  pretty-name: 'W4JetsToLNu_MadgraphPythia_part2'
+  cross-section: 544.3
+  generated-events: 2073275.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 27
+
+'root16/hist_WW_Pythia_part1_Ch0.root':
+  type: mc
+  pretty-name: 'WW_Pythia_part1'
+  cross-section: 118.7
+  generated-events: 994012.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 19
+
+'root16/hist_WZ_Pythia_part1_Ch0.root':
+  type: mc
+  pretty-name: 'WZ_Pythia_part1'
+  cross-section: 47.13
+  generated-events: 1000000.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 20
+
+'root16/hist_ZJets_M10to50_MadgraphPythia_part1_Ch0.root':
+  type: mc
+  pretty-name: 'ZJets_M10to50_MadgraphPythia_part1'
+  cross-section: 18610.0
+  generated-events: 49469812.0
+  fill-color: '#000099'
+  group: GZJets
+  order: 23
+
+'root16/hist_ZJets_M50_aMCatNLOPythia_Ch0.root':
+  type: mc
+  pretty-name: 'ZJets_M50_aMCatNLOPythia'
+  cross-section: 6077.22
+  generated-events: 80478895.0
+  fill-color: '#000099'
+  group: GZJets
+  order: 22
+
+'root16/hist_ZZ_Pythia_part2_Ch0.root':
+  type: mc
+  pretty-name: 'ZZ_Pythia_part2'
+  cross-section: 16.523
+  generated-events: 998034.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 21
+
+'root16/hist_ttHTobb_PowhegPythia_Ch0.root':
+  type: mc
+  pretty-name: 'ttHTobb_PowhegPythia'
+  cross-section: 0.2934
+  generated-events: 9764780.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 8
+
+'root16/hist_ttWToLNu_aMCatNLOMadspinPythia_part2_Ch0.root':
+  type: mc
+  pretty-name: 'ttWToLNu_aMCatNLOMadspinPythia_part2'
+  cross-section: 0.2043
+  generated-events: 1603527.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 11
+
+'root16/hist_ttZToLLNuNu_aMCatNLOMadspinPythia_part1_Ch0.root':
+  type: mc
+  pretty-name: 'ttZToLLNuNu_aMCatNLOMadspinPythia_part1'
+  cross-section: 0.2529
+  generated-events: 927976.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 13
+
+'root16/hist_ttZToLLNuNu_aMCatNLOMadspinPythia_part3_Ch0.root':
+  type: mc
+  pretty-name: 'ttZToLLNuNu_aMCatNLOMadspinPythia_part3'
+  cross-section: 0.2529
+  generated-events: 2769646.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 13
+
+'root16/hist_TTLJ_PowhegPythia_ttbj_Ch1.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythia_ttbj'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#660000'
+  group: Gttbj
+  order: 1
+
+'root16/hist_TTLJ_PowhegPythia_ttother_Ch1.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythia_ttother'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 4
+
+'root16/hist_W2JetsToLNu_MadgraphPythia_part1_Ch1.root':
+  type: mc
+  pretty-name: 'W2JetsToLNu_MadgraphPythia_part1'
+  cross-section: 2793
+  generated-events: 30064264.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 25
+
+'root16/hist_W3JetsToLNu_MadgraphPythia_part1_Ch1.root':
+  type: mc
+  pretty-name: 'W3JetsToLNu_MadgraphPythia_part1'
+  cross-section: 992.5
+  generated-events: 19798117.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 26
+
+'root16/hist_W4JetsToLNu_MadgraphPythia_part1_Ch1.root':
+  type: mc
+  pretty-name: 'W4JetsToLNu_MadgraphPythia_part1'
+  cross-section: 544.3
+  generated-events: 9116657.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 27
+
+'root16/hist_W4JetsToLNu_MadgraphPythia_part3_Ch1.root':
+  type: mc
+  pretty-name: 'W4JetsToLNu_MadgraphPythia_part3'
+  cross-section: 544.3
+  generated-events: 18751462.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 27
+
+'root16/hist_WW_Pythia_part2_Ch1.root':
+  type: mc
+  pretty-name: 'WW_Pythia_part2'
+  cross-section: 118.7
+  generated-events: 6843148.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 19
+
+'root16/hist_WZ_Pythia_part2_Ch1.root':
+  type: mc
+  pretty-name: 'WZ_Pythia_part2'
+  cross-section: 47.13
+  generated-events: 2997571.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 20
+
+'root16/hist_ZJets_M10to50_MadgraphPythia_part2_Ch1.root':
+  type: mc
+  pretty-name: 'ZJets_M10to50_MadgraphPythia_part2'
+  cross-section: 18610.0
+  generated-events: 29374008.0
+  fill-color: '#000099'
+  group: GZJets
+  order: 23
+
+'root16/hist_ZZ_Pythia_part1_Ch1.root':
+  type: mc
+  pretty-name: 'ZZ_Pythia_part1'
+  cross-section: 16.523
+  generated-events: 990064.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 21
+
+'root16/hist_ttHToNonbb_PowhegPythia_Ch1.root':
+  type: mc
+  pretty-name: 'ttHToNonbb_PowhegPythia'
+  cross-section: 0.2151
+  generated-events: 9757039.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 9
+
+'root16/hist_ttWToLNu_aMCatNLOMadspinPythia_part1_Ch1.root':
+  type: mc
+  pretty-name: 'ttWToLNu_aMCatNLOMadspinPythia_part1'
+  cross-section: 0.2043
+  generated-events: 1112722.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 11
+
+'root16/hist_ttWToQQ_aMCatNLOMadspinPythia_Ch1.root':
+  type: mc
+  pretty-name: 'ttWToQQ_aMCatNLOMadspinPythia'
+  cross-section: 0.4062
+  generated-events: 430310.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 10
+
+'root16/hist_ttZToLLNuNu_aMCatNLOMadspinPythia_part2_Ch1.root':
+  type: mc
+  pretty-name: 'ttZToLLNuNu_aMCatNLOMadspinPythia_part2'
+  cross-section: 0.2529
+  generated-events: 2723203.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 13
+
+'root16/hist_ttZToQQ_aMCatNLOMadspinPythia_Ch1.root':
+  type: mc
+  pretty-name: 'ttZToQQ_aMCatNLOMadspinPythia'
+  cross-section: 0.5297
+  generated-events: 351164.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 12
+
+'root16/hist_DataSingleEGB_Ch1.root':
+  type: data
+  pretty-name: 'DataSingleEGB'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleEGC_Ch1.root':
+  type: data
+  pretty-name: 'DataSingleEGC'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleEGD_Ch1.root':
+  type: data
+  pretty-name: 'DataSingleEGD'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleEGE_Ch1.root':
+  type: data
+  pretty-name: 'DataSingleEGE'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleEGF_Ch1.root':
+  type: data
+  pretty-name: 'DataSingleEGF'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleEGG_Ch1.root':
+  type: data
+  pretty-name: 'DataSingleEGG'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_DataSingleEGH_Ch1.root':
+  type: data
+  pretty-name: 'DataSingleEGH'
+  marker-size: 0.6
+  group: GData
+
+'root16/hist_QCD_Pt-1000toInf_MuEnriched_part1_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-1000toInf_MuEnriched_part1'
+  cross-section: 1.62131692
+  generated-events: 3939725.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 38
+
+'root16/hist_QCD_Pt-1000toInf_MuEnriched_part2_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-1000toInf_MuEnriched_part2'
+  cross-section: 1.62131692
+  generated-events: 9638102.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 38
+
+'root16/hist_QCD_Pt-120to170_EMEnriched_part1_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-120to170_EMEnriched_part1'
+  cross-section: 62964.0
+  generated-events: 36015016.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 44
+
+'root16/hist_QCD_Pt-120to170_EMEnriched_part2_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-120to170_EMEnriched_part2'
+  cross-section: 62964.0
+  generated-events: 42563399.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 44
+
+'root16/hist_QCD_Pt-120to170_MuEnriched_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-120to170_MuEnriched'
+  cross-section: 25190.51514
+  generated-events: 7897731.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 33
+
+'root16/hist_QCD_Pt-15to20_MuEnriched_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-15to20_MuEnriched'
+  cross-section: 3819570.0
+  generated-events: 4141251.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 29
+
+'root16/hist_QCD_Pt-170to300_EMEnriched_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-170to300_EMEnriched'
+  cross-section: 18810.0
+  generated-events: 11540163.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 45
+
+'root16/hist_QCD_Pt-170to300_MuEnriched_part1_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-170to300_MuEnriched_part1'
+  cross-section: 8654.49315
+  generated-events: 7947159.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 34
+
+'root16/hist_QCD_Pt-170to300_MuEnriched_part2_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-170to300_MuEnriched_part2'
+  cross-section: 8654.49315
+  generated-events: 9403072.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 34
+
+'root16/hist_QCD_Pt-20to30_EMEnriched_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-20to30_EMEnriched'
+  cross-section: 5352960.0
+  generated-events: 9241500.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 40
+
+'root16/hist_QCD_Pt-20to30_MuEnriched_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-20to30_MuEnriched'
+  cross-section: 2960198.4
+  generated-events: 31878740.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 30
+
+'root16/hist_QCD_Pt-300to470_MuEnriched_part1_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-300to470_MuEnriched_part1'
+  cross-section: 797.35269
+  generated-events: 7937590.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 35
+
+'root16/hist_QCD_Pt-300to470_MuEnriched_part2_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-300to470_MuEnriched_part2'
+  cross-section: 797.35269
+  generated-events: 16462878.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 35
+
+'root16/hist_QCD_Pt-300to470_MuEnriched_part3_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-300to470_MuEnriched_part3'
+  cross-section: 797.35269
+  generated-events: 24605508.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 35
+
+'root16/hist_QCD_Pt-300toInf_EMEnriched_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-300toInf_EMEnriched'
+  cross-section: 1350.0
+  generated-events: 7380341.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 46
+
+'root16/hist_QCD_Pt-30to50_EMEnriched_part1_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-30to50_EMEnriched_part1'
+  cross-section: 9928000.0
+  generated-events: 4736443.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 41
+
+'root16/hist_QCD_Pt-30to50_EMEnriched_part2_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-30to50_EMEnriched_part2'
+  cross-section: 9928000.0
+  generated-events: 6772399.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 41
+
+'root16/hist_QCD_Pt-470to600_MuEnriched_part1_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-470to600_MuEnriched_part1'
+  cross-section: 79.02553776
+  generated-events: 3972819.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 36
+
+'root16/hist_QCD_Pt-470to600_MuEnriched_part2_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-470to600_MuEnriched_part2'
+  cross-section: 79.02553776
+  generated-events: 5668793.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 36
+
+'root16/hist_QCD_Pt-470to600_MuEnriched_part3_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-470to600_MuEnriched_part3'
+  cross-section: 79.02553776
+  generated-events: 9847664.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 36
+
+'root16/hist_QCD_Pt-50to80_EMEnriched_part1_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-50to80_EMEnriched_part1'
+  cross-section: 2890800.0
+  generated-events: 22455794.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 42
+
+'root16/hist_QCD_Pt-50to80_EMEnriched_part2_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-50to80_EMEnriched_part2'
+  cross-section: 2890800.0
+  generated-events: 23333265.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 42
+
+'root16/hist_QCD_Pt-50to80_MuEnriched_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-50to80_MuEnriched'
+  cross-section: 437504.1
+  generated-events: 19662175.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 31
+
+'root16/hist_QCD_Pt-600to800_MuEnriched_part1_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-600to800_MuEnriched_part1'
+  cross-section: 25.09505908
+  generated-events: 4010136.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 37
+
+'root16/hist_QCD_Pt-600to800_MuEnriched_part2_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-600to800_MuEnriched_part2'
+  cross-section: 25.09505908
+  generated-events: 5971175.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 37
+
+'root16/hist_QCD_Pt-800to1000_MuEnriched_part1_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-800to1000_MuEnriched_part1'
+  cross-section: 4.707368272
+  generated-events: 3962749.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 37
+
+'root16/hist_QCD_Pt-800to1000_MuEnriched_part2_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-800to1000_MuEnriched_part2'
+  cross-section: 4.707368272
+  generated-events: 6011849.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 37
+
+'root16/hist_QCD_Pt-800to1000_MuEnriched_part3_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-800to1000_MuEnriched_part3'
+  cross-section: 4.707368272
+  generated-events: 9966149.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 37
+
+'root16/hist_QCD_Pt-80to120_EMEnriched_part1_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-80to120_EMEnriched_part1'
+  cross-section: 350000.0
+  generated-events: 35926841.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 43
+
+'root16/hist_QCD_Pt-80to120_EMEnriched_part2_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-80to120_EMEnriched_part2'
+  cross-section: 350000.0
+  generated-events: 41873363.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 43
+
+'root16/hist_QCD_Pt-80to120_MuEnriched_part1_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-80to120_MuEnriched_part1'
+  cross-section: 106033.6648
+  generated-events: 13750713.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 32
+
+'root16/hist_QCD_Pt-80to120_MuEnriched_part2_Ch1.root':
+  type: mc
+  pretty-name: 'QCD_Pt-80to120_MuEnriched_part2'
+  cross-section: 106033.6648
+  generated-events: 9809949.0
+  fill-color: '#d0cfd4'
+  group: GQCD
+  order: 32
+
+'root16/hist_SingleTbar_tW_PowhegPythia_Ch1.root':
+  type: mc
+  pretty-name: 'SingleTbar_tW_PowhegPythia'
+  cross-section: 35.85
+  generated-events: 4942374.0
+  fill-color: '#990099'
+  group: GSingleT
+  order: 18
+
+'root16/hist_SingleTbar_t_PowhegPythia_Ch1.root':
+  type: mc
+  pretty-name: 'SingleTbar_t_PowhegPythia'
+  cross-section: 80.95
+  generated-events: 17780700.0
+  fill-color: '#990099'
+  group: GSingleT
+  order: 17
+
+'root16/hist_SingleTop_s_aMCatNLOPythia_Ch1.root':
+  type: mc
+  pretty-name: 'SingleTop_s_aMCatNLOPythia'
+  cross-section: 3.36
+  generated-events: 6137801.0
+  fill-color: '#990099'
+  group: GSingleT
+  order: 16
+
+'root16/hist_SingleTop_tW_PowhegPythia_Ch1.root':
+  type: mc
+  pretty-name: 'SingleTop_tW_PowhegPythia'
+  cross-section: 35.85
+  generated-events: 4945734.0
+  fill-color: '#990099'
+  group: GSingleT
+  order: 15
+
+'root16/hist_SingleTop_t_PowhegPythia_Ch1.root':
+  type: mc
+  pretty-name: 'SingleTop_t_PowhegPythia'
+  cross-section: 136.02
+  generated-events: 31848000.0
+  fill-color: '#990099'
+  group: GSingleT
+  order: 14
+
+'root16/hist_TTJJ_PowhegPythiaBkg_Ch1.root':
+  type: mc
+  pretty-name: 'TTJJ_PowhegPythiaBkg'
+  cross-section: 377.96
+  generated-events: 67963984.0
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 7
+
+'root16/hist_TTLJ_PowhegPythiaBkg_Ch1.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythiaBkg'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 6
+
+'root16/hist_TTLJ_PowhegPythia_ttLF_Ch1.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythia_ttLF'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#cc0000'
+  group: GttLF
+  order: 3
+
+'root16/hist_TTLJ_PowhegPythia_ttbb_Ch1.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythia_ttbb'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#330000'
+  group: Gttbb
+  order: 0
+
+#'root16/hist_TTLJ_PowhegPythia_ttbbFilter_Ch1.root':
+#  type: mc
+#  pretty-name: 'TTLJ_PowhegPythia_ttbbFilter'
+#  cross-section: 365.34
+#  generated-events: 22572864.0
+#  fill-color: '#330000'
+#  group: Gttbb
+#  order: 0
+
+'root16/hist_TTLJ_PowhegPythia_ttcc_Ch1.root':
+  type: mc
+  pretty-name: 'TTLJ_PowhegPythia_ttcc'
+  cross-section: 365.34
+  generated-events: 106736180.0
+  fill-color: '#990000'
+  group: Gttcc
+  order: 2
+
+'root16/hist_TTLL_PowhegPythiaBkg_Ch1.root':
+  type: mc
+  pretty-name: 'TTLL_PowhegPythiaBkg'
+  cross-section: 88.29
+  generated-events: 67312164.0
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 5
+
+'root16/hist_W1JetsToLNu_MadgraphPythia_Ch1.root':
+  type: mc
+  pretty-name: 'W1JetsToLNu_MadgraphPythia'
+  cross-section: 9625
+  generated-events: 45283121.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 24
+
+'root16/hist_W2JetsToLNu_MadgraphPythia_part2_Ch1.root':
+  type: mc
+  pretty-name: 'W2JetsToLNu_MadgraphPythia_part2'
+  cross-section: 2793
+  generated-events: 30374504.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 25
+
+'root16/hist_W3JetsToLNu_MadgraphPythia_part2_Ch1.root':
+  type: mc
+  pretty-name: 'W3JetsToLNu_MadgraphPythia_part2'
+  cross-section: 992.5
+  generated-events: 39501912.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 26
+
+'root16/hist_W4JetsToLNu_MadgraphPythia_part2_Ch1.root':
+  type: mc
+  pretty-name: 'W4JetsToLNu_MadgraphPythia_part2'
+  cross-section: 544.3
+  generated-events: 2073275.0
+  fill-color: '#ff9933'
+  group: GWJets
+  order: 27
+
+'root16/hist_WW_Pythia_part1_Ch1.root':
+  type: mc
+  pretty-name: 'WW_Pythia_part1'
+  cross-section: 118.7
+  generated-events: 994012.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 19
+
+'root16/hist_WZ_Pythia_part1_Ch1.root':
+  type: mc
+  pretty-name: 'WZ_Pythia_part1'
+  cross-section: 47.13
+  generated-events: 1000000.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 20
+
+'root16/hist_ZJets_M10to50_MadgraphPythia_part1_Ch1.root':
+  type: mc
+  pretty-name: 'ZJets_M10to50_MadgraphPythia_part1'
+  cross-section: 18610.0
+  generated-events: 49469812.0
+  fill-color: '#000099'
+  group: GZJets
+  order: 23
+
+'root16/hist_ZJets_M50_aMCatNLOPythia_Ch1.root':
+  type: mc
+  pretty-name: 'ZJets_M50_aMCatNLOPythia'
+  cross-section: 6077.22
+  generated-events: 80478895.0
+  fill-color: '#000099'
+  group: GZJets
+  order: 22
+
+'root16/hist_ZZ_Pythia_part2_Ch1.root':
+  type: mc
+  pretty-name: 'ZZ_Pythia_part2'
+  cross-section: 16.523
+  generated-events: 998034.0
+  fill-color: '#00cccc'
+  group: GVV
+  order: 21
+
+'root16/hist_ttHTobb_PowhegPythia_Ch1.root':
+  type: mc
+  pretty-name: 'ttHTobb_PowhegPythia'
+  cross-section: 0.2934
+  generated-events: 9764780.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 8
+
+'root16/hist_ttWToLNu_aMCatNLOMadspinPythia_part2_Ch1.root':
+  type: mc
+  pretty-name: 'ttWToLNu_aMCatNLOMadspinPythia_part2'
+  cross-section: 0.2043
+  generated-events: 1603527.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 11
+
+'root16/hist_ttZToLLNuNu_aMCatNLOMadspinPythia_part1_Ch1.root':
+  type: mc
+  pretty-name: 'ttZToLLNuNu_aMCatNLOMadspinPythia_part1'
+  cross-section: 0.2529
+  generated-events: 927976.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 13
+
+'root16/hist_ttZToLLNuNu_aMCatNLOMadspinPythia_part3_Ch1.root':
+  type: mc
+  pretty-name: 'ttZToLLNuNu_aMCatNLOMadspinPythia_part3'
+  cross-section: 0.2529
+  generated-events: 2769646.0
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 13

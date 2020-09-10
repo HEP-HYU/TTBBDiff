@@ -1,0 +1,45 @@
+dist: bionic
+sudo: false
+language: cpp
+compiler:
+- gcc
+env:
+- ROOT_VERSION=6.18.04
+addons:
+  apt:
+    packages:
+    - libboost-dev
+    - libboost-filesystem-dev
+    - libboost-regex-dev
+    - libboost-system-dev
+    - git
+    - make
+    - ghostscript
+    - cmake
+before_install:
+- export PATH=$HOME/.local/bin:$PATH
+- pip install --user pyyaml requests
+- wget https://root.cern/download/root_v6.18.04.Linux-ubuntu18-x86_64-gcc7.4.tar.gz
+- tar xf root_v${ROOT_VERSION}.Linux-ubuntu18-x86_64-gcc7.4.tar.gz
+- cd root
+- . bin/thisroot.sh
+- cd ..
+- mkdir -p $HOME/.config/ImageMagick
+- cp test/policy.xml $HOME/.config/ImageMagick
+- sudo rm -f /etc/ImageMagick-6/policy.xml # workaround
+script:
+- cd test
+- ./run_tests.sh
+jobs:
+  include:
+  - install:
+    - cd external
+    - "./build-external.sh"
+    - cd ..
+    - make -j2
+  - install:
+    - CMAKE_PREFIX_PATH=$ROOTSYS cmake .
+    - make -j2
+notifications:
+  webhooks:
+    secure: "J4npfBEcy46HLSeO0iflHtD+bBmAJoKG+nsq1edOJt1F83qHpbHORPEyeQaNYA49Xl1Humg+3Jk9XD6oFg1KA0tDFJ/HWdqV1CZ5WOO7z/AyO1Lck6oTj8EekUmTfay41ABT+2Ezmj7ZkzkT4uvEJe5xzd3QDbegWyy1Fo4j3I5q7MN63BGB/8RqoMsGDa08oqPX+jmaAMO58DA5Mg2g68b82xqa6p/Bas0YSYKUjmbYDRK6Z9KDW8eNfUrpo6qdVWJeVjp9BdrwIB1EnnXK38JbSZ8OJ8K2H4sANcH/pbqgjhcGUXv4bEmuYg8YZFgoupVl5TIVzz1nnPcGHOQ9dnJcbG/yyr7wRL6p0SirxD9WE/mA2ZlNCMVl2tyDJ8MSzhfwR/XqgCBhN6cJuzkhRUD9mGPgW2yebXEbZzncE7RtC5uZRkJ01+GuiJ5qZIVYU3bc4CzMtm1D39Ley3YriFF1su1kD3X/Yuu9iYb8vwgQtCb4jb4RnOvdGa4XQDgF9KPnv5euLee9R4GqmyaukiPsgA8+V9YRsZyL2ISeYx2Rkg7XpB7yOIGE/scxEkUs4I5SmOEeb6t8cZDLLctjWj4NlFuiQP1mxMBgn6DE1qDIMblXvoU6uSxYvkq/iDhY94VabgfORrRhHPZRkQyAbl4rA7cZF4RNywhF7pRxeOs=" # mattermost
