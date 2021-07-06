@@ -1,0 +1,18 @@
+'h_mbb':
+  x-axis: "M_{b#bar{b}}"
+  y-axis: "Events"
+  y-axis-format: "%1% / %2$.1f GeV"
+  save-extensions: ['pdf']
+  #log-y: true
+  show-ratio: true
+  for-yields: true
+  yields-table-order: 0
+  yields-title: '$DNN 6j4b'
+
+'h_dRbb':
+  x-axis: "#DeltaR_{b#bar{b}}"
+  y-axis: "Events"
+  y-axis-format: "%1% / %2$.2f"
+  save-extensions: ['pdf']
+  #log-y: true
+  show-ratio: true

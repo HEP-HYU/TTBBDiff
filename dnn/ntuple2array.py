@@ -12,7 +12,7 @@ import deepdish.io as io
 import os
 import multiprocessing as mp
 import time
-from tqdm import tqdm
+#from tqdm import tqdm
 
 import utils as ut
 
@@ -38,13 +38,6 @@ def merge(arrayDir):
 
             selEvent.reset_index(drop=True, inplace=True)
             io.save(arrayDir+"/"+process+".h5",selEvent)
-
-
-def transversemass(vec1, met):
-    tmp1 = TLorentzVector(vec1.Px(), vec1.Py(), 0, vec1.E()*math.sin(vec1.Theta()))
-    tmp2 = TLorentzVector(met.Px(), met.Py(), 0, met.E());
-
-    return (tmp1+tmp2).M()
 
 def makeCombi(inputDir, inputFile, outputDir, makeTrainingInput=False, sys=''):
     print(str(inputDir+"/"+inputFile)+" start")
@@ -91,6 +84,43 @@ def makeCombi(inputDir, inputFile, outputDir, makeTrainingInput=False, sys=''):
         nbjets = 0
         addbjet1_matched = TLorentzVector(0,0,0,0)
         addbjet2_matched = TLorentzVector(0,0,0,0)
+
+        #making hadronic W
+        Wh = TLorentzVector()
+        tmpWhM = 999
+
+        for a in range(len(chain.jet_pt)-1):
+          for b in range(a+1, len(chain.jet_pt)):
+            jet1 = TLorentzVector()
+            jet2 = TLorentzVector()
+            jet1.SetPtEtaPhiE(chain.jet_pt[a],chain.jet_eta[a],chain.jet_phi[a],chain.jet_e[a])
+            jet2.SetPtEtaPhiE(chain.jet_pt[b],chain.jet_eta[b],chain.jet_phi[b],chain.jet_e[b])
+
+            #jet pt correction?
+            if not data :
+                if   'jecup'   in sys:
+                    jet1 *= chain.jet_JER_Nom[a] * chain.jet_JES_Up[a]
+                    jet2 *= chain.jet_JER_Nom[b] * chain.jet_JES_Up[b]
+                elif 'jecdown' in sys:
+                    jet1 *= chain.jet_JER_Nom[a] * chain.jet_JES_Down[a]
+                    jet2 *= chain.jet_JER_Nom[b] * chain.jet_JES_Down[b]
+                elif 'jerup'   in sys:
+                    jet1 *= chain.jet_JER_Up[a]
+                    jet2 *= chain.jet_JER_Up[b]
+                elif 'jerdown' in sys:
+                    jet1 *= chain.jet_JER_Down[a]
+                    jet2 *= chain.jet_JER_Down[b]
+                else:
+                    jet1 *= chain.jet_JER_Nom[a]
+                    jet2 *= chain.jet_JER_Nom[b]
+
+            if jet1.Pt() < jet_pt or abs(jet1.Eta()) > jet_eta: continue
+            if jet2.Pt() < jet_pt or abs(jet2.Eta()) > jet_eta: continue
+
+            tmpWh = jet1 + jet2
+            if abs(tmpWh.M() - 80.2) < tmpWhM:
+              Wh = tmpWh
+              tmpWhM = tmpWh.M()
 
         for iJet in range(len(chain.jet_pt)):
             jet = TLorentzVector()
@@ -172,14 +202,18 @@ def makeCombi(inputDir, inputFile, outputDir, makeTrainingInput=False, sys=''):
                             signal = 0
 
                         jetCombi.append([
-                            signal,i,b1.DeltaR(b2),abs(b1.Eta()-b2.Eta()),b1.DeltaPhi(b2),
-                            (b1+b2+nu).Pt(),(b1+b2+nu).Eta(),(b1+b2+nu).Phi(),(b1+b2+nu).M(),
-                            (b1+b2+lep).Pt(),(b1+b2+lep).Eta(),(b1+b2+lep).Phi(),(b1+b2+lep).M(),
-                            (b1+lep).Pt(),(b1+lep).Eta(),(b1+lep).Phi(),(b1+lep).M(),
-                            (b2+lep).Pt(),(b2+lep).Eta(),(b2+lep).Phi(),(b2+lep).M(),
-                            (b1+b2).Pt(),(b1+b2).Eta(),(b1+b2).Phi(),(b1+b2).M(),
-                            chain.jet_deepCSV[j],chain.jet_deepCSV[k],
-                            b1.Pt(),b2.Pt(),b1.Eta(),b2.Eta(),b1.Phi(),b2.Phi(),b1.E(),b2.E()
+                            signal,i,
+                            b1.DeltaR(b2),abs(b1.Eta()-b2.Eta()),b1.DeltaPhi(b2),(b1+b2).Pt(),(b1+b2).Eta(),(b1+b2).M(),
+                            (b1+b2).DeltaR(nu),abs((b1+b2).Eta()-nu.Eta()),(b1+b2).DeltaPhi(nu),(b1+b2+nu).Pt(),(b1+b2+nu).M(),(b1+b2).Pt()+nu.Pt(),
+                            (b1+b2).DeltaR(lep),abs((b1+b2).Eta()-lep.Eta()),(b1+b2).DeltaPhi(lep),(b1+b2+lep).Pt(),(b1+b2+lep).Eta(),(b1+b2+lep).M(),
+                            b1.DeltaR(nu),abs(b1.Eta()-nu.Eta()),b1.DeltaPhi(nu),(b1+nu).M(),
+                            b2.DeltaR(nu),abs(b2.Eta()-nu.Eta()),b2.DeltaPhi(nu),(b2+nu).M(),b2.Pt()+nu.Pt(),
+                            b1.DeltaR(lep),abs(b1.Eta()-lep.Eta()),b1.DeltaPhi(lep),(b1+lep).Pt(),(b1+lep).Eta(),(b1+lep).M(),b1.Pt()+lep.Pt(),
+                            b2.DeltaR(lep),abs(b2.Eta()-lep.Eta()),b2.DeltaPhi(lep),(b2+lep).Pt(),(b2+lep).Eta(),(b2+lep).M(),b2.Pt()+lep.Pt(),
+#                            chain.jet_deepCSV[j],chain.jet_deepCSV[k],
+                            b1.DeltaR(Wh),abs(b1.Eta()-Wh.Eta()),b1.DeltaPhi(Wh),(b1+Wh).Pt(),(b1+Wh).M(),b1.Pt()+Wh.Pt(),
+                            b2.DeltaR(Wh),abs(b2.Eta()-Wh.Eta()),b2.DeltaPhi(Wh),(b2+Wh).Pt(),(b2+Wh).M(),b2.Pt()+Wh.Pt(),
+                            b1.Pt(),b2.Pt(),b1.Eta(),b2.Eta(),b1.Phi(),b2.Phi(),b1.E(),b2.E(),
                         ])
                     else:
                         jetCombi.append([
@@ -192,14 +226,17 @@ def makeCombi(inputDir, inputFile, outputDir, makeTrainingInput=False, sys=''):
                             addbjet2.Pt(), addbjet2.Eta(), addbjet2.Phi(), addbjet2.E(),
                             j,k,
                             #Deep learning variables
-                            b1.DeltaR(b2),abs(b1.Eta()-b2.Eta()),b1.DeltaPhi(b2),
-                            (b1+b2+nu).Pt(),(b1+b2+nu).Eta(),(b1+b2+nu).Phi(),(b1+b2+nu).M(),
-                            (b1+b2+lep).Pt(),(b1+b2+lep).Eta(),(b1+b2+lep).Phi(),(b1+b2+lep).M(),
-                            (b1+lep).Pt(),(b1+lep).Eta(),(b1+lep).Phi(),(b1+lep).M(),
-                            (b2+lep).Pt(),(b2+lep).Eta(),(b2+lep).Phi(),(b2+lep).M(),
-                            (b1+b2).Pt(),(b1+b2).Eta(),(b1+b2).Phi(),(b1+b2).M(),
-                            chain.jet_deepCSV[j],chain.jet_deepCSV[k],
-                            b1.Pt(),b2.Pt(),b1.Eta(),b2.Eta(),b1.Phi(),b2.Phi(),b1.E(),b2.E()
+                            b1.DeltaR(b2),abs(b1.Eta()-b2.Eta()),b1.DeltaPhi(b2),(b1+b2).Pt(),(b1+b2).Eta(),(b1+b2).M(),
+                            (b1+b2).DeltaR(nu),abs((b1+b2).Eta()-nu.Eta()),(b1+b2).DeltaPhi(nu),(b1+b2+nu).Pt(),(b1+b2+nu).M(),(b1+b2).Pt()+nu.Pt(),
+                            (b1+b2).DeltaR(lep),abs((b1+b2).Eta()-lep.Eta()),(b1+b2).DeltaPhi(lep),(b1+b2+lep).Pt(),(b1+b2+lep).Eta(),(b1+b2+lep).M(),
+                            b1.DeltaR(nu),abs(b1.Eta()-nu.Eta()),b1.DeltaPhi(nu),(b1+nu).M(),
+                            b2.DeltaR(nu),abs(b2.Eta()-nu.Eta()),b2.DeltaPhi(nu),(b2+nu).M(),b2.Pt()+nu.Pt(),
+                            b1.DeltaR(lep),abs(b1.Eta()-lep.Eta()),b1.DeltaPhi(lep),(b1+lep).Pt(),(b1+lep).Eta(),(b1+lep).M(),b1.Pt()+lep.Pt(),
+                            b2.DeltaR(lep),abs(b2.Eta()-lep.Eta()),b2.DeltaPhi(lep),(b2+lep).Pt(),(b2+lep).Eta(),(b2+lep).M(),b2.Pt()+lep.Pt(),
+#                            chain.jet_deepCSV[j],chain.jet_deepCSV[k],
+                            b1.DeltaR(Wh),abs(b1.Eta()-Wh.Eta()),b1.DeltaPhi(Wh),(b1+Wh).Pt(),(b1+Wh).M(),b1.Pt()+Wh.Pt(),
+                            b2.DeltaR(Wh),abs(b2.Eta()-Wh.Eta()),b2.DeltaPhi(Wh),(b2+Wh).Pt(),(b2+Wh).M(),b2.Pt()+Wh.Pt(),
+                            b1.Pt(),b2.Pt(),b1.Eta(),b2.Eta(),b1.Phi(),b2.Phi(),b1.E(),b2.E(),
                             ])
 
     if makeTrainingInput:
@@ -265,51 +302,52 @@ if __name__ == '__main__':
 
     (options,args) = parser.parse_args()
 
-    tmpDir = '/data/users/seohyun/ntuple/Run2017/V9_6/'
+#    tmpDir = '/data/users/seohyun/ntuple/Run2017/V9_6/'
+    tmpDir = '/data/users/seohyun/ntuple/Run2018/V10_3'
     ntupleDir = tmpDir+'/split/'
     arrayDir = './array/'
 
     processes = []
     if len(args) is 1:
-      f = open(args[0], "r") 
-      processes = f.read().splitlines()
+        f = open(args[0], "r") 
+        processes = f.read().splitlines()
     else:
-      processes = os.listdir(ntupleDir) 
+        processes = os.listdir(ntupleDir) 
 
     start_time = time.time()
 
     if options.merge:
-      merge(arrayDir)
+         merge(arrayDir)
 
     if options.deep:
-	makeCombi(tmpDir+'/nosplit/', 'TTLJ_PowhegPythia_ttbb.root', arrayDir, True)
+        makeCombi(tmpDir+'/nosplit/', 'TTLJ_PowhegPythia_ttbb.root', arrayDir, True)
 
     if options.test:
-	if not os.path.exists("test"):
-	  os.makedirs('./test')
-	makeCombi(ntupleDir+'TTLJ_PowhegPythia_ttbb','Tree_ttbbLepJets_002.root' ,'./test')
+        if not os.path.exists("test"):
+            os.makedirs('./test')
+            makeCombi(ntupleDir+'TTLJ_PowhegPythia_ttbb','Tree_ttbbLepJets_002.root' ,'./test')
 
     if options.all:
-	for process in processes:
-	    if not os.path.exists(arrayDir+process):
-		os.makedirs(arrayDir+process)
-	    for item in os.listdir(ntupleDir+process):
-		proc = mp.Process(target=makeCombi, args=(ntupleDir+process,item, arrayDir+process))
-		proc.start()
-	    for item in os.listdir(ntupleDir+process):
-		proc.join()
+        for process in processes:
+            if not os.path.exists(arrayDir+process):
+                os.makedirs(arrayDir+process)
+        for item in os.listdir(ntupleDir+process):
+            proc = mp.Process(target=makeCombi, args=(ntupleDir+process,item, arrayDir+process))
+            proc.start()
+        for item in os.listdir(ntupleDir+process):
+            proc.join()
 
-	if options.sys:
-	    syslist = ['jecup','jecdown','jerup','jerdown']
-	    for sys in syslist:
-		for process in processes:
-		    if not ('Data' in process or 'SYS' in process or 'Herwig' in process or 'Evtgen' in process or 'aMC' in process):
-			os.makedirs(arrayDir+process+'__'+sys)
-			for item in os.listdir(ntupleDir+process):
-			    proc = mp.Process(target=makeCombi, args=(ntupleDir+process,item,arrayDir+process+'__'+sys,sys))
-			    proc.start()
-			for item in os.listdir(ntupleDir+process):
-			    proc.join()
+    if options.sys:
+        syslist = ['jecup','jecdown','jerup','jerdown']
+        for sys in syslist:
+            for process in processes:
+                if not ('Data' in process or 'SYS' in process or 'Herwig' in process or 'Evtgen' in process or 'aMC' in process):
+                    os.makedirs(arrayDir+process+'__'+sys)
+                    for item in os.listdir(ntupleDir+process):
+                        proc = mp.Process(target=makeCombi, args=(ntupleDir+process,item,arrayDir+process+'__'+sys,sys))
+                        proc.start()
+                    for item in os.listdir(ntupleDir+process):
+                        proc.join()
 
     print("Total running time :%s " %(time.time() - start_time))
 
