@@ -1,0 +1,5 @@
+with dnn ntuple
+1. dnn_tree -> array : r2hdf.py -d(for trainig)
+2. array -> train : train.py
+3. dnn_tree -> array : r2hdf.py -a(for output distributions)
+3. to get output distributions: train_validation.py
