@@ -10,7 +10,7 @@ from keras.optimizers import Adam, SGD
 from keras.callbacks import Callback, ModelCheckpoint
 
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 from sklearn.utils import class_weight
 from sklearn.metrics import roc_auc_score, roc_curve
@@ -28,13 +28,13 @@ import os
 
 from sklearn.preprocessing import StandardScaler, label_binarize
 
-trainInput = 'rdf_array/array_dnn_TTLJ_PowhegPythia_ttbb.h5'
+trainInput = './array/array_dnn_TTLJ_PowhegPythia_ttbb.h5'
 
-name_inputvar = ['mbb','dRbb','dPhibb','dEtabb','Etabb','Phibb','mlbb','dRlbb','mlb1','dRlb1','mlb2','dRlb2','mnubb','dRnubb','mnub1','dRnub1','mnub2','dRnub2','dRlnubb','pt1','pt2','eta1','eta2','d1','d2','e1','e2','m1','m2','nbjets','lepton_pt','lepton_eta','lepton_e','MET','MET_phi']
+name_inputvar = ['mbb','dRbb','dPhibb','dEtabb','Etabb','Phibb','mlbb','dRlbb','mlb1','dRlb1','mlb2','dRlb2','pt1','pt2','eta1','eta2','d1','d2','e1','e2','m1','m2','nbjets','lepton_pt','lepton_eta','lepton_m','btag3rd','btag4th']
 
 print ("number of variables: "+str(len(list(name_inputvar))))
 
-model_name = 'sample'
+model_name = 'model_example'
 df_data = pd.read_hdf(trainInput)
 data = df_data
 
@@ -54,13 +54,14 @@ groupped_event = all_event.drop_duplicates(subset=['event'])
 nevt = len(groupped_event)
 print("number of total event = "+str(len(groupped_event)))
 
-#split_nevt = groupped_event[:int(nevt*0.8)].iloc[-1]
 split_nevt = groupped_event[:int(nevt*0.9)].iloc[-1]
 split_point = -1
 for idx, row in all_event.iterrows():
   if (row['event'] == split_nevt['event']):
-    if split_point < 0: split_point = idx
-#need to check
+    if split_point < 0:
+        split_point = idx
+        break
+
 train_event = all_event[:split_point]
 valid_event = all_event[split_point:]
 
@@ -121,7 +122,6 @@ with tf.device("/cpu:0") :
     x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
     x = Dropout(b)(x)
     x = Dense(a, activation='relu', kernel_initializer=init, bias_initializer='zeros')(x)
-    #x = Dropout(b)(x)
     outputs = Dense(1, activation='sigmoid')(x)
     model = Model(inputs=inputs, outputs=outputs)
 
@@ -149,8 +149,6 @@ else:
     ######################################
     pred_data = pd.DataFrame(model.predict(train_data, batch_size=2048), columns=['pred']).set_index(train_event.index)
     pred = pd.concat([pred_data,train_event], axis=1)
-#    pred.columns = pred.columns.map(str)
-#    idx = pred.groupby(['event'])['0'].transform(max) == pred['0']
     idx = pred.groupby(['event'])['pred'].transform(max) == pred['pred']
     pred = pred[idx]
     train_nevt = len(train_event.drop_duplicates(subset=['event']))
@@ -163,8 +161,6 @@ else:
 
     pred_val_data = pd.DataFrame(model.predict(valid_data, batch_size=2048), columns=['pred']).set_index(valid_event.index)
     pred_val = pd.concat([pred_val_data,valid_event], axis=1)
-#    pred_val.columns = pred_val.columns.map(str)
-#    idx = pred_val.groupby(['event'])['0'].transform(max) == pred_val['0']
     idx = pred_val.groupby(['event'])['pred'].transform(max) == pred_val['pred']
     pred_val = pred_val[idx]
     val_nevt = len(valid_event.drop_duplicates(subset=['event']))
