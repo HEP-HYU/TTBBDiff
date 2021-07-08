@@ -1,10 +1,12 @@
 import ROOT
 from ROOT import *
+from array import array
 import os,sys
+import time
 
-#inputDir = '/data/users/sarakm0704/ntuple/ttbb/V10_3/sync/merged/'
-#inputDir = '/data/users/sarakm0704/ntuple/ttbb/V9_7/merged/'
-inputDir = '/data/users/sarakm0704/ntuple/ttbb/V8_1/merged/'
+#inputDir = '/data1/common/skimmed_NanoAOD/ttbb_ntuple_v3/2016/'
+#inputDir = '/data1/common/skimmed_NanoAOD/ttbb_ntuple_v3/2017/'
+inputDir = '/data1/common/skimmed_NanoAOD/ttbb_ntuple_v3/2016/'
 
 def writeConfig(inputDir, process):
 
@@ -15,8 +17,11 @@ def writeConfig(inputDir, process):
     order = 'poo'
 
     #### TTbar ####
-    if "TTLJ" in process:
+    if "TTToSemiLeptonic" in process:
       xsec = 365.34
+      fillcolor = '#330000'
+      group = 'GttSL'
+      order = 0
 
       if "ttbb" in process:
         fillcolor = '#330000'
@@ -52,41 +57,40 @@ def writeConfig(inputDir, process):
         order = 6
       else: print("RAISE "+str(process))
 
-    elif "TTLL" in process:
+    elif "TTTo2L2Nu" in process:
       xsec = 88.29
       fillcolor = '#ff6666'
       group = "GttBkg"
       order = 5
-
  
-    elif "TTJJ" in process:
+    elif "TTToHadronic" in process:
       xsec = 377.96
       fillcolor = '#ff6666'
       group = "GttBkg"
       order = 7
 
     #### SingleTop ####
-    elif "SingleT" in process:
+    elif "ST" in process:
       fillcolor = '#990099'
       group = "GSingleT"
       
-      if "SingleTop_s_" in process:
+      if "ST_s-" in process:
         xsec = 3.36
         order = 16
 
-      elif "SingleTop_t_" in process:
+      elif "ST_t-channel_top" in process:
         xsec = 136.02
         order = 14
 
-      elif "SingleTbar_t_" in process:
+      elif "ST_t-channel_antitop" in process:
         xsec = 80.95
         order = 17
 
-      elif "SingleTop_tW_" in process:
+      elif "ST_tW_top" in process:
         xsec = 35.85
         order = 15
 
-      elif "SingleTbar_tW_" in process:
+      elif "ST_tW_antitop" in process:
         xsec = 35.85
         order = 18
 
@@ -96,54 +100,66 @@ def writeConfig(inputDir, process):
 
     elif "W1Jet" in process:
       xsec = 9625
-      group = "GWJets"
+      group = "GVJets"
       fillcolor = '#ff9933'
       order = 24
 
     elif "W2Jet" in process:
       xsec = 2793
-      group = "GWJets"
+      group = "GVJets"
       fillcolor = '#ff9933'
       order = 25
 
     elif "W3Jet" in process:
       xsec = 992.5
-      group = "GWJets"
+      group = "GVJets"
       fillcolor = '#ff9933'
       order = 26
 
     elif "W4Jet" in process:
       xsec = 544.3
-      group = "GWJets"
+      group = "GVJets"
       fillcolor = '#ff9933'
       order = 27
 
-    elif "WW" in process:
-      xsec = 118.7
+    elif "WWTo2L2Nu" in process:
+      xsec = 12.178
       fillcolor = '#00cccc'
       group = "GVV"
       order = 19
 
-    elif "WZ" in process:
-      xsec = 47.13
+    elif "WWToLNuQQ" in process:
+      xsec = 49.997
+      fillcolor = '#00cccc'
+      group = "GVV"
+      order = 19
+
+    elif "WZTo2L2Q" in process:
+      xsec = 5.595
       fillcolor = '#00cccc'
       group = "GVV"
       order = 20
 
-    elif "ZJets_M10to50" in process:
+    elif "WZTo3LNu" in process:
+      xsec = 4.42965
+      fillcolor = '#00cccc'
+      group = "GVV"
+      order = 20
+
+    elif "DYJetsToLL_M-10to50" in process:
       xsec = 18610.0
       fillcolor = '#000099'
-      group = "GZJets"
+      group = "GVJets"
       order = 23
 
-    elif "ZJets_M50" in process:
+    elif "DYJetsToLL_M-50" in process:
       xsec = 6077.22
       fillcolor = '#000099'
-      group = "GZJets"
+      group = "GVJets"
       order = 22
 
-    elif "ZZ" in process:
-      xsec = 16.523
+    elif "ZZTo2L2Q" in process:
+      xsec = 3.22
       fillcolor = '#00cccc'
       group = "GVV"
       order = 21
@@ -151,131 +167,79 @@ def writeConfig(inputDir, process):
     elif "ttHToNonbb" in process:
       xsec = 0.2151
       fillcolor = '#ff66ff'
-      group = "GttX"
+      group = "GttH"
       order = 9
 
     elif "ttHTobb" in process:
       xsec = 0.2934
       fillcolor = '#ff66ff'
-      group = "GttX"
+      group = "GttH"
       order = 8
 
-    elif "ttWToLNu" in process:
+    elif "TTWJetsToLNu" in process:
       xsec = 0.2043
       fillcolor = '#ff66ff'
       group = "GttX"
       order = 11
 
-    elif "ttWToQQ" in process:
+    elif "TTWJetsToQQ" in process:
       xsec = 0.4062
       fillcolor = '#ff66ff'
       group = "GttX"
       order = 10
 
-    elif "ttZToLLNuNu" in process:
+    elif "TTZToLLNuNu_M-10" in process:
       xsec = 0.2529
       fillcolor = '#ff66ff'
       group = "GttX"
       order = 13
 
-    elif "ttZToQQ" in process:
+    elif "TTZToQQ_TuneCP5" in process:
       xsec = 0.5297
       fillcolor = '#ff66ff'
       group = "GttX"
       order = 12
 
-    elif "QCD" in process:
-      fillcolor = '#d0cfd4'
-      group = "GQCD"
-      
-      if "15to20_MuEnriched" in process:
-        xsec = 3819570.0
-        order = 29
-      elif "20to30_MuEnriched" in process:
-        xsec = 2960198.4
-        order = 30
-      elif "50to80_MuEnriched" in process:
-        xsec = 437504.1
-        order = 31
-      elif "80to120_MuEnriched" in process:
-        xsec = 106033.6648
-        order = 32
-      elif "120to170_MuEnriched" in process:
-        xsec = 25190.51514
-        order = 33
-      elif "170to300_MuEnriched" in process:
-        xsec = 8654.49315
-        order = 34
-      elif "300to470_MuEnriched" in process:
-        xsec = 797.35269
-        order = 35
-      elif "470to600_MuEnriched" in process:
-        xsec = 79.02553776
-        order = 36
-      elif "600to800_MuEnriched" in process:
-        xsec = 25.09505908
-        order = 37
-      elif "800to1000_MuEnriched" in process:
-        xsec = 4.707368272
-        order = 37
-      elif "1000toInf_MuEnriched" in process:
-        xsec = 1.62131692
-        order = 38
-
-      elif "15to20_EMEnriched" in process:
-        xsec = 2302200.0
-        order = 39
-      elif "20to30_EMEnriched" in process:
-        xsec = 5352960.0
-        order = 40
-      elif "30to50_EMEnriched" in process:
-        xsec = 9928000.0
-        order = 41
-      elif "50to80_EMEnriched" in process:
-        xsec = 2890800.0
-        order = 42
-      elif "80to120_EMEnriched" in process:
-        xsec = 350000.0
-        order = 43
-      elif "120to170_EMEnriched" in process:
-        xsec = 62964.0
-        order = 44
-      elif "170to300_EMEnriched" in process:
-        xsec = 18810.0
-        order = 45
-      elif "300toInf_EMEnriched" in process:
-        xsec = 1350.0
-        order = 46
-
     else: print("RAISE "+str(process))
 
-    f = TFile.Open(inputDir+process)
-
-    h_eventInfo = f.Get('ttbbLepJets/EventInfo')
-    evt = h_eventInfo.GetBinContent(2)
-    
-    f.Close()
-
-    print("  pretty-name: '"+str(process[:-5])+"'")
+    print("  pretty-name: '"+str(process)+"'")
     print("  cross-section: "+str(xsec))
-    print("  generated-events: "+str(evt))
+
     print("  fill-color: '"+str(fillcolor)+"'")
     print("  group: "+str(group))
     print("  order: "+str(order))
 
-for process in os.listdir(inputDir):   
 
-    if "WJet" in process: continue
+def merge(inputDir, process):
+    f = TFile.Open(inputDir+process)
+    hist = f.Get('hcounter1_nocut')
+    h_merge.Add(hist)
 
-    if not "root" in process: continue
-    print("\n'root16/hist_"+str(process)+"':")
-    if "Data" in process:
+start_time = time.time()
+
+print("Start processing")
+
+for target in os.listdir(inputDir):
+
+#    if "TTToSemi" in target: continue
+
+    h_merge = TH1D('h_merge','Event counter',2,-0.5,1.5)
+
+    for process in os.listdir(inputDir+target):
+        #print("Start "+str(process))
+        merge(inputDir+target+"/", process)
+
+    print("")      
+    print("'root17/hist_"+str(target)+".root':")
+    
+    if "Single" in target or "EGamma" in target:
       print("  type: data")
-      print("  pretty-name: '"+str(process[:-5])+"'")
+      print("  pretty-name: '"+str(target)+"'")
       print("  marker-size: 0.6")
       print("  group: GData")
-    else: 
+    else:
       print("  type: mc")
-      writeConfig(inputDir,process)
-    
-print ("DONE")
+      writeConfig(inputDir,target)
+      print("  generated-events: "+str(h_merge.Integral()))
+
+#print("Done! Total running time :%s " %(time.time() - start_time))

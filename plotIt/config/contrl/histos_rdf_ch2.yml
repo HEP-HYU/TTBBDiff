@@ -1,3 +1,38 @@
+'h_njets_S0':
+  x-axis: "Jet multiplicity"
+  y-axis: "Events"
+  y-axis-format: "%1%"
+  save-extensions: ['pdf']
+  log-y: true
+  show-ratio: true
+
+'h_lepton_pt_S0':
+  x-axis: "Lepton p_{T} (GeV)" 
+  y-axis: "Events"
+  y-axis-format: "%1% / %2$.1f GeV"
+  save-extensions: ['pdf']
+  show-ratio: true
+  #for-yields: true
+  log-y: true
+  #yields-table-order: 0
+  #yields-title: '$S0'
+
+'h_lepton_eta_S0':
+  x-axis: "Lepton ||#eta||"
+  y-axis: "Events"
+  y-axis-format: "%1% / %2$.2f"
+  save-extensions: ['pdf']
+  #log-y: true
+  show-ratio: true
+
+'h_lepton_phi_S0':
+  x-axis: "Lepton #phi"
+  y-axis: "Events"
+  y-axis-format: "%1% / %2$.2f"
+  save-extensions: ['pdf']
+  #log-y: true
+  show-ratio: true
+
 'h_njets_S1':
   x-axis: "Jet multiplicity"
   y-axis: "Events"
@@ -12,13 +47,13 @@
   y-axis-format: "%1% / %2$.1f GeV"
   save-extensions: ['pdf']
   show-ratio: true
-  for-yields: true
+#  for-yields: true
   log-y: true
-  yields-table-order: 0
-  yields-title: '$S1'
+#  yields-table-order: 0
+#  yields-title: '1l 1j'
 
 'h_lepton_eta_S1':
-  x-axis: "Lepton #eta"
+  x-axis: "Lepton |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
@@ -57,11 +92,11 @@
   show-ratio: true
   for-yields: true
   log-y: true
-  yields-table-order: 1
-  yields-title: '$S2'
+  yields-table-order: 0
+  yields-title: '1l 4j 2b'
 
 'h_lepton_eta_S2':
-  x-axis: "Lepton #eta"
+  x-axis: "Lepton |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
@@ -85,7 +120,7 @@
   show-ratio: true
 
 'h_jet1_eta_S2':
-  x-axis: "Leading Jet #eta"
+  x-axis: "Leading Jet |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
@@ -101,7 +136,7 @@
   show-ratio: true
 
 'h_jet2_eta_S2':
-  x-axis: "Subleading Jet #eta"
+  x-axis: "Subleading Jet |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
@@ -118,7 +153,7 @@
   show-ratio: true
 
 'h_jet3_eta_S2':
-  x-axis: "3^{rd} Jet #eta"
+  x-axis: "3^{rd} Jet |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
@@ -135,7 +170,7 @@
   show-ratio: true
 
 'h_jet4_eta_S2':
-  x-axis: "4^{th} Jet #eta"
+  x-axis: "4^{th} Jet |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
@@ -158,11 +193,11 @@
   show-ratio: true
   for-yields: true
   log-y: true
-  yields-table-order: 2
-  yields-title: '$S3'
+  yields-table-order: 1
+  yields-title: '1l 6j 2b'
 
 'h_lepton_eta_S3':
-  x-axis: "Lepton #eta"
+  x-axis: "Lepton |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
@@ -186,7 +221,7 @@
   show-ratio: true
 
 'h_jet1_eta_S3':
-  x-axis: "Leading Jet #eta"
+  x-axis: "Leading Jet |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
@@ -202,7 +237,7 @@
   show-ratio: true
 
 'h_jet2_eta_S3':
-  x-axis: "Subleading Jet #eta"
+  x-axis: "Subleading Jet |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
@@ -219,7 +254,7 @@
   show-ratio: true
 
 'h_jet3_eta_S3':
-  x-axis: "3^{rd} Jet #eta"
+  x-axis: "3^{rd} Jet |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
@@ -236,7 +271,7 @@
   show-ratio: true
 
 'h_jet4_eta_S3':
-  x-axis: "4^{th} Jet #eta"
+  x-axis: "4^{th} Jet |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
@@ -251,11 +286,11 @@
   show-ratio: true
   for-yields: true
   log-y: true
-  yields-table-order: 3
-  yields-title: '$S4'
+  yields-table-order: 2
+  yields-title: '1l 6j 4b'
 
 'h_lepton_eta_S4':
-  x-axis: "Lepton #eta"
+  x-axis: "Lepton |#eta|"
   y-axis: "Events"
   y-axis-format: "%1% / %2$.2f"
   save-extensions: ['pdf']
