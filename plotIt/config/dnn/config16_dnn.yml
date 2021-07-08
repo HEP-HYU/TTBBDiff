@@ -21,7 +21,7 @@ configuration:
   yields-table-numerical-precision-yields: 2
 
 files: 
-  include: ['files16_rdf.yml']
+  include: ['files16_dnn.yml']
 
 systematics:
 #  - ttbb_xsec:     {type: const, value: 1.055, on: 'hist_ttbb.root'}
@@ -90,7 +90,7 @@ systematics:
 #  - cferr2
 
 plots:
-  include: ['histos_rdf_ch2.yml']
+  include: ['histos_dnn.yml']
 
 legend:
 #  position: [0.18, 0.68, 0.92, 0.89]

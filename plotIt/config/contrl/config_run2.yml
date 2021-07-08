@@ -2,12 +2,11 @@ configuration:
   width: 450 
   height: 450
   luminosity-label: '%1$.1f fb^{-1} at #sqrt{s} = 13 TeV'
-  experiment: " CMS"
+#  experiment: " CMS"
 #  extra-label: "Preliminary"
 #  extra-label: "Work in Progress"
   root: ''
-#  luminosity: 59741 
-  luminosity: 59352
+  luminosity: 137192 
   luminosity-error: 0.00
   #luminosity-error: 0.025
   error-fill-style: 3154
@@ -22,7 +21,7 @@ configuration:
   yields-table-numerical-precision-yields: 2
 
 files: 
-  include: ['files18_rdf.yml']
+  include: ['files_run2.yml']
 
 systematics:
 #  - ttbb_xsec:     {type: const, value: 1.055, on: 'hist_ttbb.root'}
@@ -50,7 +49,7 @@ systematics:
 #  - musf
 #  - musf
 #  - jec
-# - jer
+#  - jer
 #  - scale: {type: shape, on: 'hist_ttbb.root'}
 #  - scale: {type: shape, on: 'hist_ttbj.root'}
 #  - scale: {type: shape, on: 'hist_ttcc.root'}

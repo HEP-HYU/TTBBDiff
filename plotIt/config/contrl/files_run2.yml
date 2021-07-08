@@ -1,0 +1,515 @@
+'root/hist_Electron_Ch1.root':
+  type: data
+  pretty-name: 'Electron'
+  marker-size: 0.6
+  group: GData
+
+'root/hist_SingleMuon_Ch0.root':
+  type: data
+  pretty-name: 'SingleMuon'
+  marker-size: 0.6
+  group: GData
+
+'root/hist_DYJetsToLL_M-10to50_Ch0.root':
+  type: mc
+  pretty-name: 'DYJetsToLL_M-10to50'
+  #cross-section: 18610.0
+  fill-color: '#000099'
+  group: GVJets
+  order: 23
+  generated-events: 137192.0 # 86300742.0
+
+'root/hist_TTTo2L2Nu_Ch0.root':
+  type: mc
+  pretty-name: 'TTTo2L2Nu'
+  #cross-section: 88.29
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 5
+  generated-events: 137192.0 # 63791484.0
+
+'root/hist_TTToHadronic_Ch0.root':
+  type: mc
+  pretty-name: 'TTToHadronic'
+  #cross-section: 377.96
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 7
+  generated-events: 137192.0 # 194926898.0
+
+'root/hist_DYJetsToLL_M-50-amcatnloFXFX_Ch0.root':
+  type: mc
+  pretty-name: 'DYJetsToLL_M-50-amcatnloFXFX'
+  #cross-section: 6077.22
+  fill-color: '#000099'
+  group: GVJets
+  order: 22
+  generated-events: 137192.0 # 131615987.0
+
+'root/hist_ST_s-channel_4f_leptonDecays_Ch0.root':
+  type: mc
+  pretty-name: 'ST_s-channel_4f_leptonDecays'
+  #cross-section: 3.36
+  fill-color: '#990099'
+  group: GSingleT
+  order: 16
+  generated-events: 137192.0 # 24906122.0
+
+'root/hist_ST_t-channel_antitop_Ch0.root':
+  type: mc
+  pretty-name: 'ST_t-channel_antitop'
+  #cross-section: 80.95
+  fill-color: '#990099'
+  group: GSingleT
+  order: 17
+  generated-events: 137192.0 # 74227130.0
+
+'root/hist_ST_t-channel_top_Ch0.root':
+  type: mc
+  pretty-name: 'ST_t-channel_top'
+  #cross-section: 136.02
+  fill-color: '#990099'
+  group: GSingleT
+  order: 14
+  generated-events: 137192.0 # 144094782.0
+
+'root/hist_ST_tW_antitop_Ch0.root':
+  type: mc
+  pretty-name: 'ST_tW_antitop'
+  #cross-section: 35.85
+  fill-color: '#990099'
+  group: GSingleT
+  order: 18
+  generated-events: 137192.0 # 7588180.0
+
+'root/hist_ST_tW_top_Ch0.root':
+  type: mc
+  pretty-name: 'ST_tW_top'
+  #cross-section: 35.85
+  fill-color: '#990099'
+  group: GSingleT
+  order: 15
+  generated-events: 137192.0 # 9553912.0
+
+'root/hist_TTWJetsToLNu_Ch0.root':
+  type: mc
+  pretty-name: 'TTWJetsToLNu'
+  #cross-section: 0.2043
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 11
+  generated-events: 137192.0 # 2686095.0
+
+'root/hist_TTWJetsToQQ_Ch0.root':
+  type: mc
+  pretty-name: 'TTWJetsToQQ'
+  #cross-section: 0.4062
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 10
+  generated-events: 137192.0 # 458226.0
+
+'root/hist_TTZToLLNuNu_M-10_Ch0.root':
+  type: mc
+  pretty-name: 'TTZToLLNuNu_M-10'
+  #cross-section: 0.2529
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 13
+  generated-events: 137192.0 # 6274046.0
+
+'root/hist_TTZToQQ_TuneCP5_13TeV_Ch0.root':
+  type: mc
+  pretty-name: 'TTZToQQ_TuneCP5_13TeV'
+  #cross-section: 0.5297
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 12
+  generated-events: 137192.0 # 4576760.0
+
+'root/hist_ttHToNonbb_Ch0.root':
+  type: mc
+  pretty-name: 'ttHToNonbb'
+  #cross-section: 0.2151
+  fill-color: '#ff66ff'
+  group: GttH
+  order: 9
+  generated-events: 137192.0 # 7368333.0
+
+'root/hist_ttHTobb_Ch0.root':
+  type: mc
+  pretty-name: 'ttHTobb'
+  #cross-section: 0.2934
+  fill-color: '#ff66ff'
+  group: GttH
+  order: 8
+  generated-events: 137192.0 # 20970827.0
+
+'root/hist_W1JetsToLNu_Ch0.root':
+  type: mc
+  pretty-name: 'W1JetsToLNu'
+  #cross-section: 9625
+  fill-color: '#ff9933'
+  group: GVJets
+  order: 24
+  generated-events: 137192.0 # 51047866.0
+
+'root/hist_W2JetsToLNu_Ch0.root':
+  type: mc
+  pretty-name: 'W2JetsToLNu'
+  #cross-section: 2793
+  fill-color: '#ff9933'
+  group: GVJets
+  order: 25
+  generated-events: 137192.0 # 23272818.0
+
+'root/hist_W3JetsToLNu_Ch0.root':
+  type: mc
+  pretty-name: 'W3JetsToLNu'
+  #cross-section: 992.5
+  fill-color: '#ff9933'
+  group: GVJets
+  order: 26
+  generated-events: 137192.0 # 14492897.0
+
+'root/hist_W4JetsToLNu_Ch0.root':
+  type: mc
+  pretty-name: 'W4JetsToLNu'
+  #cross-section: 544.3
+  fill-color: '#ff9933'
+  group: GVJets
+  order: 27
+  generated-events: 137192.0 # 10062333.0
+
+'root/hist_WWTo2L2Nu_Ch0.root':
+  type: mc
+  pretty-name: 'WWTo2L2Nu'
+  #cross-section: 12.178
+  fill-color: '#00cccc'
+  group: GVV
+  order: 19
+  generated-events: 137192.0 # 7729266.0
+
+'root/hist_WWToLNuQQ_Ch0.root':
+  type: mc
+  pretty-name: 'WWToLNuQQ'
+  #cross-section: 49.997
+  fill-color: '#00cccc'
+  group: GVV
+  order: 19
+  generated-events: 137192.0 # 19127022.0
+
+'root/hist_WZTo2L2Q_Ch0.root':
+  type: mc
+  pretty-name: 'WZTo2L2Q'
+  #cross-section: 5.595
+  fill-color: '#00cccc'
+  group: GVV
+  order: 20
+  generated-events: 137192.0 # 17048434.0
+
+'root/hist_WZTo3LNu_Ch0.root':
+  type: mc
+  pretty-name: 'WZTo3LNu'
+  #cross-section: 4.42965
+  fill-color: '#00cccc'
+  group: GVV
+  order: 20
+  generated-events: 137192.0 # 6739437.0
+
+'root/hist_ZZTo2L2Q_Ch0.root':
+  type: mc
+  pretty-name: 'ZZTo2L2Q'
+  #cross-section: 3.22
+  fill-color: '#00cccc'
+  group: GVV
+  order: 21
+  generated-events: 137192.0 # 17815223.0
+
+'root/hist_TTToSemiLeptonic_ttbj_Ch0.root':
+  type: mc
+  pretty-name: 'TTToSemiLeptonic_ttbj'
+  #cross-section: 365.34
+  fill-color: '#660000'
+  group: Gttbj
+  order: 1
+  generated-events: 137192.0 # 298744402.0
+
+'root/hist_TTToSemiLeptonic_ttbb_Ch0.root':
+  type: mc
+  pretty-name: 'TTToSemiLeptonic_ttbb'
+  #cross-section: 365.34
+  fill-color: '#330000'
+  group: Gttbb
+  order: 0
+  generated-events: 137192.0 # 298744402.0
+
+'root/hist_TTToSemiLeptonic_ttcc_Ch0.root':
+  type: mc
+  pretty-name: 'TTToSemiLeptonic_ttcc'
+  #cross-section: 365.34
+  fill-color: '#990000'
+  group: Gttcc
+  order: 2
+  generated-events: 137192.0 # 298744402.0
+
+'root/hist_TTToSemiLeptonic_ttother_Ch0.root':
+  type: mc
+  pretty-name: 'TTToSemiLeptonic_ttother'
+  #cross-section: 365.34
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 4
+  generated-events: 137192.0 # 298744402.0
+
+'root/hist_DYJetsToLL_M-10to50_Ch1.root':
+  type: mc
+  pretty-name: 'DYJetsToLL_M-10to50'
+  #cross-section: 18610.0
+  fill-color: '#000099'
+  group: GVJets
+  order: 23
+  generated-events: 137192.0 # 86300742.0
+
+'root/hist_TTTo2L2Nu_Ch1.root':
+  type: mc
+  pretty-name: 'TTTo2L2Nu'
+  #cross-section: 88.29
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 5
+  generated-events: 137192.0 # 63791484.0
+
+'root/hist_TTToHadronic_Ch1.root':
+  type: mc
+  pretty-name: 'TTToHadronic'
+  #cross-section: 377.96
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 7
+  generated-events: 137192.0 # 194926898.0
+
+'root/hist_DYJetsToLL_M-50-amcatnloFXFX_Ch1.root':
+  type: mc
+  pretty-name: 'DYJetsToLL_M-50-amcatnloFXFX'
+  #cross-section: 6077.22
+  fill-color: '#000099'
+  group: GVJets
+  order: 22
+  generated-events: 137192.0 # 131615987.0
+
+'root/hist_ST_s-channel_4f_leptonDecays_Ch1.root':
+  type: mc
+  pretty-name: 'ST_s-channel_4f_leptonDecays'
+  #cross-section: 3.36
+  fill-color: '#990099'
+  group: GSingleT
+  order: 16
+  generated-events: 137192.0 # 24906122.0
+
+'root/hist_ST_t-channel_antitop_Ch1.root':
+  type: mc
+  pretty-name: 'ST_t-channel_antitop'
+  #cross-section: 80.95
+  fill-color: '#990099'
+  group: GSingleT
+  order: 17
+  generated-events: 137192.0 # 74227130.0
+
+'root/hist_ST_t-channel_top_Ch1.root':
+  type: mc
+  pretty-name: 'ST_t-channel_top'
+  #cross-section: 136.02
+  fill-color: '#990099'
+  group: GSingleT
+  order: 14
+  generated-events: 137192.0 # 144094782.0
+
+'root/hist_ST_tW_antitop_Ch1.root':
+  type: mc
+  pretty-name: 'ST_tW_antitop'
+  #cross-section: 35.85
+  fill-color: '#990099'
+  group: GSingleT
+  order: 18
+  generated-events: 137192.0 # 7588180.0
+
+'root/hist_ST_tW_top_Ch1.root':
+  type: mc
+  pretty-name: 'ST_tW_top'
+  #cross-section: 35.85
+  fill-color: '#990099'
+  group: GSingleT
+  order: 15
+  generated-events: 137192.0 # 9553912.0
+
+'root/hist_TTWJetsToLNu_Ch1.root':
+  type: mc
+  pretty-name: 'TTWJetsToLNu'
+  #cross-section: 0.2043
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 11
+  generated-events: 137192.0 # 2686095.0
+
+'root/hist_TTWJetsToQQ_Ch1.root':
+  type: mc
+  pretty-name: 'TTWJetsToQQ'
+  #cross-section: 0.4062
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 10
+  generated-events: 137192.0 # 458226.0
+
+'root/hist_TTZToLLNuNu_M-10_Ch1.root':
+  type: mc
+  pretty-name: 'TTZToLLNuNu_M-10'
+  #cross-section: 0.2529
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 13
+  generated-events: 137192.0 # 6274046.0
+
+'root/hist_TTZToQQ_TuneCP5_13TeV_Ch1.root':
+  type: mc
+  pretty-name: 'TTZToQQ_TuneCP5_13TeV'
+  #cross-section: 0.5297
+  fill-color: '#ff66ff'
+  group: GttX
+  order: 12
+  generated-events: 137192.0 # 4576760.0
+
+'root/hist_ttHToNonbb_Ch1.root':
+  type: mc
+  pretty-name: 'ttHToNonbb'
+  #cross-section: 0.2151
+  fill-color: '#ff66ff'
+  group: GttH
+  order: 9
+  generated-events: 137192.0 # 7368333.0
+
+'root/hist_ttHTobb_Ch1.root':
+  type: mc
+  pretty-name: 'ttHTobb'
+  #cross-section: 0.2934
+  fill-color: '#ff66ff'
+  group: GttH
+  order: 8
+  generated-events: 137192.0 # 20970827.0
+
+'root/hist_W1JetsToLNu_Ch1.root':
+  type: mc
+  pretty-name: 'W1JetsToLNu'
+  #cross-section: 9625
+  fill-color: '#ff9933'
+  group: GVJets
+  order: 24
+  generated-events: 137192.0 # 51047866.0
+
+'root/hist_W2JetsToLNu_Ch1.root':
+  type: mc
+  pretty-name: 'W2JetsToLNu'
+  #cross-section: 2793
+  fill-color: '#ff9933'
+  group: GVJets
+  order: 25
+  generated-events: 137192.0 # 23272818.0
+
+'root/hist_W3JetsToLNu_Ch1.root':
+  type: mc
+  pretty-name: 'W3JetsToLNu'
+  #cross-section: 992.5
+  fill-color: '#ff9933'
+  group: GVJets
+  order: 26
+  generated-events: 137192.0 # 14492897.0
+
+'root/hist_W4JetsToLNu_Ch1.root':
+  type: mc
+  pretty-name: 'W4JetsToLNu'
+  #cross-section: 544.3
+  fill-color: '#ff9933'
+  group: GVJets
+  order: 27
+  generated-events: 137192.0 # 10062333.0
+
+'root/hist_WWTo2L2Nu_Ch1.root':
+  type: mc
+  pretty-name: 'WWTo2L2Nu'
+  #cross-section: 12.178
+  fill-color: '#00cccc'
+  group: GVV
+  order: 19
+  generated-events: 137192.0 # 7729266.0
+
+'root/hist_WWToLNuQQ_Ch1.root':
+  type: mc
+  pretty-name: 'WWToLNuQQ'
+  #cross-section: 49.997
+  fill-color: '#00cccc'
+  group: GVV
+  order: 19
+  generated-events: 137192.0 # 19127022.0
+
+'root/hist_WZTo2L2Q_Ch1.root':
+  type: mc
+  pretty-name: 'WZTo2L2Q'
+  #cross-section: 5.595
+  fill-color: '#00cccc'
+  group: GVV
+  order: 20
+  generated-events: 137192.0 # 17048434.0
+
+'root/hist_WZTo3LNu_Ch1.root':
+  type: mc
+  pretty-name: 'WZTo3LNu'
+  #cross-section: 4.42965
+  fill-color: '#00cccc'
+  group: GVV
+  order: 20
+  generated-events: 137192.0 # 6739437.0
+
+'root/hist_ZZTo2L2Q_Ch1.root':
+  type: mc
+  pretty-name: 'ZZTo2L2Q'
+  #cross-section: 3.22
+  fill-color: '#00cccc'
+  group: GVV
+  order: 21
+  generated-events: 137192.0 # 17815223.0
+
+'root/hist_TTToSemiLeptonic_ttbj_Ch1.root':
+  type: mc
+  pretty-name: 'TTToSemiLeptonic_ttbj'
+  #cross-section: 365.34
+  fill-color: '#660000'
+  group: Gttbj
+  order: 1
+  generated-events: 137192.0 # 298744402.0
+
+'root/hist_TTToSemiLeptonic_ttbb_Ch1.root':
+  type: mc
+  pretty-name: 'TTToSemiLeptonic_ttbb'
+  #cross-section: 365.34
+  fill-color: '#330000'
+  group: Gttbb
+  order: 0
+  generated-events: 137192.0 # 298744402.0
+
+'root/hist_TTToSemiLeptonic_ttcc_Ch1.root':
+  type: mc
+  pretty-name: 'TTToSemiLeptonic_ttcc'
+  #cross-section: 365.34
+  fill-color: '#990000'
+  group: Gttcc
+  order: 2
+  generated-events: 137192.0 # 298744402.0
+
+'root/hist_TTToSemiLeptonic_ttother_Ch1.root':
+  type: mc
+  pretty-name: 'TTToSemiLeptonic_ttother'
+  #cross-section: 365.34
+  fill-color: '#ff6666'
+  group: GttBkg
+  order: 4
+  generated-events: 137192.0 # 298744402.0

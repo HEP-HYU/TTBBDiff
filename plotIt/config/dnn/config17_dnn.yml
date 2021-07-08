@@ -2,11 +2,11 @@ configuration:
   width: 450 
   height: 450
   luminosity-label: '%1$.1f fb^{-1} at #sqrt{s} = 13 TeV'
-  experiment: " CMS"
+  #experiment: " CMS"
   #extra-label: "Preliminary"
   #extra-label: "Work in Progress"
   root: ''
-  luminosity: 35922 
+  luminosity: 41529
   luminosity-error: 0.00
   #luminosity-error: 0.025
   error-fill-style: 3154
@@ -21,7 +21,7 @@ configuration:
   yields-table-numerical-precision-yields: 2
 
 files: 
-  include: ['files16_rdf.yml']
+  include: ['files17_dnn.yml']
 
 systematics:
 #  - ttbb_xsec:     {type: const, value: 1.055, on: 'hist_ttbb.root'}
@@ -90,11 +90,10 @@ systematics:
 #  - cferr2
 
 plots:
-  include: ['histos_rdf_ch2.yml']
+  include: ['histos_dnn.yml']
 
 legend:
-  position: [0.18, 0.68, 0.92, 0.89]
-#  position: [0.18, 0.73, 0.92, 0.89] #For DNN
+  position: [0.18, 0.73, 0.92, 0.89]
   columns: 5
 
 groups:
