@@ -245,8 +245,8 @@ def ana(inputDir, process, histDir):
       if ttbb:
         gen_addbjet1 = TLorentzVector()
         gen_addbjet2 = TLorentzVector()
-        gen_addbjet1.SetPtEtaPhiE(event['addbjet1_pt'],event['addbjet1_eta'],event['addbjet1_phi'],event['addbjet1_mass'])
-        gen_addbjet2.SetPtEtaPhiE(event['addbjet2_pt'],event['addbjet2_eta'],event['addbjet2_phi'],event['addbjet2_mass'])
+        gen_addbjet1.SetPtEtaPhiM(event['addbjet1_pt'],event['addbjet1_eta'],event['addbjet1_phi'],event['addbjet1_mass'])
+        gen_addbjet2.SetPtEtaPhiM(event['addbjet2_pt'],event['addbjet2_eta'],event['addbjet2_phi'],event['addbjet2_mass'])
     
         gen_dRbb = gen_addbjet1.DeltaR(gen_addbjet2)
         gen_mbb = (gen_addbjet1+gen_addbjet2).M()
