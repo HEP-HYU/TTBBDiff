@@ -77,19 +77,19 @@ void SkimEvents::defineCuts()
       
         if(_cat == "ttbb"){
                 std::cout<<"is TTBB"<<std::endl;
-                addCuts("isttbb","000");
+                addCuts("isttbb","00");
         }
         else if(_cat == "ttbj"){
-                addCuts("isttbj","000");
+                addCuts("isttbj","00");
         }
         else if(_cat == "ttcc"){
-                addCuts("isttcc","000");
+                addCuts("isttcc","00");
         }
         else if(_cat == "ttLF"){
-                addCuts("isttLF","000");
+                addCuts("isttLF","00");
         }
         else if(_cat == "ttother"){
-                addCuts("isttother","000");
+                addCuts("isttother","00");
         }
         else cout << "cat condition is not defined" << endl;
 }
@@ -177,31 +177,31 @@ void SkimEvents::defineMoreVars()
 
   //for sync
   //if(_sync) TODO
-	addVartoStore("run"); 
-	addVartoStore("luminosityBlock");
-	addVartoStore("event");
-	addVartoStore("is_e");
-	addVartoStore("is_mu");
-	addVartoStore("flags");
-	addVartoStore("trigger_e");
-	addVartoStore("trigger_mu");
-	addVartoStore("lepton_pt");
-	addVartoStore("lepton_eta");
-	addVartoStore("lepton_deltaEtaSC");
-  addVartoStore("lepton_phi");
-  addVartoStore("lepton_abs_dxy");
-  addVartoStore("lepton_abs_dz");
-  addVartoStore("lepton_iso");
-  addVartoStore("nJets");
-  addVartoStore("jet1_pt");
-  addVartoStore("jet1_eta");
-  addVartoStore("jet1_phi");
-  addVartoStore("jet1_deepJet");
-  addVartoStore("jet2_pt");
-  addVartoStore("jet2_eta");
-  addVartoStore("jet2_phi");
-  addVartoStore("jet2_deepJet");
-  addVartoStore("nBJets_deepJetM");
+	//addVartoStore("run"); 
+	//addVartoStore("luminosityBlock");
+	//addVartoStore("event");
+	//addVartoStore("is_e");
+	//addVartoStore("is_mu");
+	//addVartoStore("flags");
+	//addVartoStore("trigger_e");
+	//addVartoStore("trigger_mu");
+	//addVartoStore("lepton_pt");
+	//addVartoStore("lepton_eta");
+	//addVartoStore("lepton_deltaEtaSC");
+  //addVartoStore("lepton_phi");
+  //addVartoStore("lepton_abs_dxy");
+  //addVartoStore("lepton_abs_dz");
+  //addVartoStore("lepton_iso");
+  //addVartoStore("nJets");
+  //addVartoStore("jet1_pt");
+  //addVartoStore("jet1_eta");
+  //addVartoStore("jet1_phi");
+  //addVartoStore("jet1_deepJet");
+  //addVartoStore("jet2_pt");
+  //addVartoStore("jet2_eta");
+  //addVartoStore("jet2_phi");
+  //addVartoStore("jet2_deepJet");
+  //addVartoStore("nBJets_deepJetM");
 
   //for syst
   addVartoStore("fixedGridRhoFastjet*"); //for JEC v2
