@@ -15,7 +15,7 @@ SECONDS=0
 #./skimnanoaod.py -F --split 10 -Y 2017 $centraldata_dir/Run2017B/SingleElectron/NANOAOD/Nano25Oct2019-v1 $target_dir/SingleElectron2017B > SingleElectron2017B.out
 
 ./skimnanoaod.py -F --split 10 -Y 2018 -C ttbb $topnanoAODv6p1/2018/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8 $debug_dir/TTToSemiLeptonic2018_v6p1  > TTToSemiLeptonic2018_v6p1.out      #normal file
-yy./skimnanoaod.py -F --split 10 -Y 2018 -C ttbb $topnanoAODv611/2018/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8 $debug_dir/TTToSemiLeptonic2018_v611  > TTToSemiLeptonic2018_v611.out    #extension file
+./skimnanoaod.py -F --split 10 -Y 2018 -C ttbb $topnanoAODv611/2018/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8 $debug_dir/TTToSemiLeptonic2018_v611  > TTToSemiLeptonic2018_v611.out    #extension file
 
 ./skimnanoaod.py -F --split 10 -Y 2017 -C ttbb $topnanoAODv6p1/2017/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8 $debug_dir/TTToSemiLeptonic2017  > TTToSemiLeptonic2017.out
 ./skimnanoaod.py -F --split 10 -Y 2017 -C ttbb $topnanoAODv6p1/2017/TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8 $debug_dir/TTToSemiLeptonic2017_PSweights  > TTToSemiLeptonic2017_PSweights.out
