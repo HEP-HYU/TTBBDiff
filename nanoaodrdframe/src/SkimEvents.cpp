@@ -24,7 +24,7 @@ void SkimEvents::defineCuts()
 
         //TODO
         // one Lepton Selection(without Trigger)
-        //addCuts("( (nmuonpass == 1 && nvetomuons == 1 && (nelepass + nvetoeles) == 0 ) || (nelepass == 1 && nvetoeles == 1 && (nmuonpass + nvetomuons) == 0 ) )","0");
+        addCuts("( (nmuonpass == 1 && nvetomuons == 1 && (nelepass + nvetoeles) == 0 ) || (nelepass == 1 && nvetoeles == 1 && (nmuonpass + nvetomuons) == 0 ) )","0");
         //MET Filter
         //sync flag
 
@@ -39,7 +39,7 @@ void SkimEvents::defineCuts()
                             //addCuts("luminosityBlock <= 79","0"); // syncMC
                             //addCuts("(is_mu || is_e)","00");
                         //}
-                        addCuts("( (HLT_IsoMu24 || HLT_IsoTkMu24) && (nmuonpass == 1 && nvetomuons == 1 && (nelepass + nvetoeles) == 0) ) || ( HLT_Ele27_WPTight_Gsf && (nelepass == 1 && nvetoeles == 1 && (nmuonpass + nvetomuons) == 0) )","0"); // MC
+                        addCuts("( channel == 0 && (HLT_IsoMu24 || HLT_IsoTkMu24) ) || ( channel == 1 && HLT_Ele27_WPTight_Gsf )","00"); // MC
                         //addCuts("HLT_IsoMu24 || HLT_IsoTkMu24","0"); // SingleMuon
                         //addCuts("nmuonpass == 1 && nvetomuons == 1 && (nelepass + nvetoeles == 0)","00"); // SingleMuon
                         //addCuts("HLT_Ele27_WPTight_Gsf","0"); // SingleElectron
@@ -51,7 +51,6 @@ void SkimEvents::defineCuts()
                             //addCuts("luminosityBlock <= 19","0"); // syncMC
                             //addCuts("(is_mu || is_e)","00");
                         //}
-                        addCuts("( nmuonpass == 1 && nvetomuons == 1 && (nelepass + nvetoeles) == 0 ) || ( nelepass == 1 && nvetoeles == 1 && (nmuonpass + nvetomuons) == 0 )","0"); // MC
                         addCuts("(channel == 0 && HLT_IsoMu27) || ( channel == 1 && ((HLT_Ele32_WPTight_Gsf_L1DoubleEG && flag_Trig) || HLT_Ele28_eta2p1_WPTight_Gsf_HT150) )","00"); // MC
                         //addCuts("HLT_IsoMu27","0"); // SingleMuon
                         //addCuts("nmuonpass == 1 && nvetomuons == 1 && (nelepass + nvetoeles == 0)","00"); // SingleMuon
@@ -64,9 +63,7 @@ void SkimEvents::defineCuts()
                             //addCuts("luminosityBlock <= 4","0"); // syncMC
                             //addCuts("(is_mu || is_e)","00");
                         //}
-                        //addCuts("( nmuonpass == 1 && nvetomuons == 1 && (nelepass + nvetoeles) == 0 ) || ( nelepass == 1 && nvetoeles == 1 && (nmuonpass + nvetomuons) == 0 )","0"); // MC
-                        //addCuts("( channel == 0 && HLT_IsoMu24 ) || ( channel == 1 && (HLT_Ele32_WPTight_Gsf || HLT_Ele28_eta2p1_WPTight_Gsf_HT150) )","00"); // MC
-                        addCuts("( HLT_IsoMu24 && (nmuonpass == 1 && nvetomuons == 1 && (nelepass + nvetoeles) == 0) ) || ( (HLT_Ele32_WPTight_Gsf || HLT_Ele28_eta2p1_WPTight_Gsf_HT150) && (nelepass == 1 && nvetoeles == 1 && (nmuonpass + nvetomuons) == 0) )","0"); // MC
+                        addCuts("( channel == 0 && HLT_IsoMu24 ) || ( channel == 1 && (HLT_Ele32_WPTight_Gsf || HLT_Ele28_eta2p1_WPTight_Gsf_HT150) )","00"); // MC
                         //addCuts("HLT_IsoMu24","0"); // SingleMuon
                         //addCuts("nmuonpass == 1 && nvetomuons == 1 && (nelepass + nvetoeles == 0)","00"); // SingleMuon
                         //addCuts("HLT_Ele32_WPTight_Gsf || HLT_Ele28_eta2p1_WPTight_Gsf_HT150","0"); // EGamma
@@ -77,19 +74,19 @@ void SkimEvents::defineCuts()
       
         if(_cat == "ttbb"){
                 std::cout<<"is TTBB"<<std::endl;
-                addCuts("isttbb","00");
+                addCuts("isttbb","000");
         }
         else if(_cat == "ttbj"){
-                addCuts("isttbj","00");
+                addCuts("isttbj","000");
         }
         else if(_cat == "ttcc"){
-                addCuts("isttcc","00");
+                addCuts("isttcc","000");
         }
         else if(_cat == "ttLF"){
-                addCuts("isttLF","00");
+                addCuts("isttLF","000");
         }
         else if(_cat == "ttother"){
-                addCuts("isttother","00");
+                addCuts("isttother","000");
         }
         else cout << "cat condition is not defined" << endl;
 }
