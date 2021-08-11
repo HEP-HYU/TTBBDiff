@@ -1,8 +1,8 @@
 #!/bin/bash
-centraldata_dir="/data1/common/NanoAOD/data/"
-centralmc16_dir="/data1/common/NanoAOD/mc/RunIISummer16NanoAODv6/"
-centralmc17_dir="/data1/common/NanoAOD/mc/RunIIFall17NanoAODv6/"
-centralmc18_dir="/data1/common/NanoAOD/mc/RunIIAutumn18NanoAODv6/"
+centraldata_dir="/data1/common/NanoAOD/v6/data/"
+centralmc16_dir="/data1/common/NanoAOD/v6/mc/RunIISummer16NanoAODv6/"
+centralmc17_dir="/data1/common/NanoAOD/v6/mc/RunIIFall17NanoAODv6/"
+centralmc18_dir="/data1/common/NanoAOD/v6/mc/RunIIAutumn18NanoAODv6/"
 topNano_dir="/data1/common/topNanoAOD/v6p1/"
 topNanoext_dir="/data1/common/topNanoAOD/v6-1-1/"
 
