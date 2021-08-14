@@ -163,7 +163,7 @@ void SkimEvents::defineMoreVars()
 	addVartoStore("Flag_EcalDeadCellTriggerPrimitiveFilter");
 	addVartoStore("Flag_BadPFMuonFilter");
 	addVartoStore("Flag_eeBadScFilter");
-	if(_year == "2017" || _year == "2018") addVartoStore("Flag_ecalBadCalibFilterV2");
+	if(_year == "2017" || _year == "2018") addVartoStore("Flag_ecalBadCalibFilter"); //MET Filter condition - NanoAODv6: Flag_ecalBadCalibFilterV2 -> UL: Flag_ecalBadCalibFilter
 
   //for ttbb
   if(_cat == "ttbb"){
