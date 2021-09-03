@@ -667,7 +667,7 @@ void plot(T sig, const std::string &name, const std::string &filename){
 void ana_rdf(TString year = "2018", TString name = "test_ttbb", TString ch = "0", TString dnn = "1"){
 
   //ROOT::RDataFrame df("outputTree",Form("/data1/common/skimmed_NanoAOD/ttbb_ntuplev2/%s/%s/*.root", year.Data(), name.Data()) ); //from local
-  ROOT::RDataFrame df("outputTree",Form("/data1/common/skimmed_NanoAOD/ttbb_ntuple_v3/%s/%s/*.root", year.Data(), name.Data()) ); //from local
+  ROOT::RDataFrame df("outputTree",Form("/data1/users/tjkim/ttbb/v0/%s/%s/*.root", year.Data(), name.Data()) ); //from local
 
 /*
   TFile *f_info = new TFile(Form("/cms/ldap_home/sarakm0704/public/ttbb/%s/sync/%s.root", name.Data()));
@@ -727,23 +727,23 @@ void ana_rdf(TString year = "2018", TString name = "test_ttbb", TString ch = "0"
   //step1
   auto df_S0 = df_ch;
 
-  if( year.Atoi() == 2016 ){
+  if( year.Contains("2016")){
       if (ch.Atoi() == 0) df_S0 = df_S0.Filter("lepton_pt > 26 && abs(lepton_eta) < 2.4");
       else if (ch.Atoi() == 1) df_S0 = df_S0.Filter("lepton_pt > 29 && abs(lepton_eta) < 2.4");
       df_S0 = df_S0.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.3093f);")
                    .Define("flag","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter) ? true : false");
 
-  }else if (year.Atoi() == 2017){ 
+  }else if (year.Contains("2017")){ 
       if (ch.Atoi() == 0) df_S0 = df_S0.Filter("lepton_pt > 29 && abs(lepton_eta) < 2.4");
       else if (ch.Atoi() == 1) df_S0 = df_S0.Filter("(lepton_pt > 34 && abs(lepton_eta) < 2.4) || (lepton_pt > 30 && abs(lepton_eta) < 2.1)");
       df_S0 = df_S0.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.3033f);")
-                   .Define("flag","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilterV2) ? true : false");
+                   .Define("flag","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter) ? true : false");
 
-  }else if (year.Atoi() == 2018){ 
+  }else if (year.Contains("2018")){ 
       if (ch.Atoi() == 0) df_S0 = df_S0.Filter("lepton_pt > 26 && abs(lepton_eta) < 2.4");
       else if (ch.Atoi() == 1) df_S0 = df_S0.Filter("(lepton_pt > 34 && abs(lepton_eta) < 2.4) || (lepton_pt > 30 && abs(lepton_eta) < 2.1)");
       df_S0 = df_S0.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.2770f);")
-                   .Define("flag","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilterV2) ? true : false");
+                   .Define("flag","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter) ? true : false");
   }
 
   df_S0 = df_S0.Define("njets","Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 )");
@@ -890,7 +890,7 @@ void ana_rdf(TString year = "2018", TString name = "test_ttbb", TString ch = "0"
   }
 
   //create ntuple
-  TFile f(Form("hist/hist_%s_Ch%s.root", name.Data(), ch.Data()),"recreate");
+  TFile f(Form("hist/hist_%s_%s_Ch%s.root", year.Data(), name.Data(), ch.Data()),"recreate");
 
   h_njets_S0->Write();
   h_lepton_pt_S0->Write();
