@@ -582,12 +582,12 @@ void NanoAODAnalyzerrdframe::selectLeptons()
                    .Define("lepton_m","is_mu ? Muon_mass[muoncuts][0] : Electron_mass[elecuts][0]");
 
         if(_year == "2018"){
-            _rlm = _rlm.Define("flags","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilterV2) ? true : false")
+            _rlm = _rlm.Define("flags","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter) ? true : false")
                        .Define("muTrigger","HLT_IsoMu24")
                        .Define("elTrigger","HLT_Ele32_WPTight_Gsf || HLT_Ele28_eta2p1_WPTight_Gsf_HT150");
         }
         if(_year == "2017"){
-            _rlm = _rlm.Define("flags","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilterV2) ? true : false")
+            _rlm = _rlm.Define("flags","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter) ? true : false")
                        .Define("flag_Trig",objectMatching,{"lepton_eta","lepton_phi","TrigObj_eta","TrigObj_phi","TrigObj_filterBits"})
                        .Define("muTrigger","HLT_IsoMu27")
                        .Define("elTrigger","(HLT_Ele32_WPTight_Gsf_L1DoubleEG && flag_Trig) || HLT_Ele28_eta2p1_WPTight_Gsf_HT150");
