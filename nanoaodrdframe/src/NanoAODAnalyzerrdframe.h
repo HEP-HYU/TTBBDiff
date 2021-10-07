@@ -137,37 +137,13 @@ private:
         FactorizedJetCorrector *_jetCorrector;
         JetCorrectionUncertainty *_jetCorrectionUncertainty;
 
-        // For 2016 Muon SF
-        TH2F* _hmuontrg2016BtoF;
-        TH2F* _hmuontrg2016GtoH;
-        TH2D* _hmuontightid2016BtoF;
-        TH2D* _hmuontightid2016GtoH;
-        TH2D* _hmuontightiso2016BtoF;
-        TH2D* _hmuontightiso2016GtoH;
-        WeightCalculatorFromHistogram* _muontrg2016BtoF;
-        WeightCalculatorFromHistogram* _muontrg2016GtoH;
-        WeightCalculatorFromHistogram* _muontightid2016BtoF;
-        WeightCalculatorFromHistogram* _muontightid2016GtoH;
-        WeightCalculatorFromHistogram* _muontightiso2016BtoF;
-        WeightCalculatorFromHistogram* _muontightiso2016GtoH;
-
-        // For 2017 Muon SF
-        TH2F* _hmuontrg2017;
-        TH2D* _hmuontightid2017;
-        TH2D* _hmuontightiso2017;
-        WeightCalculatorFromHistogram* _muontrg2017;
-        WeightCalculatorFromHistogram* _muontightid2017;
-        WeightCalculatorFromHistogram* _muontightiso2017;
-
-        // For 2018 Muon SF
-        TH2F* _hmuontrg2018before;
-        TH2F* _hmuontrg2018after;
-        TH2D* _hmuontightid2018;
-        TH2D* _hmuontightiso2018;
-        WeightCalculatorFromHistogram* _muontrg2018before;
-        WeightCalculatorFromHistogram* _muontrg2018after;
-        WeightCalculatorFromHistogram* _muontightid2018;
-        WeightCalculatorFromHistogram* _muontightiso2018;
+        // For UL Muon SF
+        TH2F* _hmuontrg;
+        TH2F* _hmuonid;
+        TH2F* _hmuoniso;
+        WeightCalculatorFromHistogram* _muontrg;
+        WeightCalculatorFromHistogram* _muonid;
+        WeightCalculatorFromHistogram* _muoniso;
 
         TauIDSFTool* _tauidVSjet;
 };

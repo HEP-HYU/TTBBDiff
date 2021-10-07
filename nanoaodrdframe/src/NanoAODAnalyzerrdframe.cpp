@@ -23,13 +23,7 @@ using namespace std;
 
 NanoAODAnalyzerrdframe::NanoAODAnalyzerrdframe(TTree *atree, std::string outfilename, std::string cat, std::string year, std::string jsonfname, std::string globaltag, int nthreads)
 :_rd(*atree),_jsonOK(false), _outfilename(outfilename), _cat(cat), _year(year), _jsonfname(jsonfname), _globaltag(globaltag), _inrootfile(0),_outrootfile(0), _rlm(_rd)
-        //, _btagcalib("DeepJet", "data/DeepJet_2016LegacySF_V1.csv")
-        //, _btagcalib("DeepJet", "data/DeepJet_2016LegacySF_V1_TuneCP5.csv")
-        //, _btagcalib("DeepJet", "data/DeepFlavour_94XSF_V4_B_F.csv")
-        //, _btagcalib("DeepJet", "data/DeepJet_102XSF_V2.csv")
-        //, _btagcalib2("DeepCSV", "data/DeepCSV_94XSF_V4_B_F.csv")
         , _btagcalibreader(BTagEntry::OP_RESHAPING, "central", {"up_jes", "down_jes"})
-        //, _btagcalibreader2(BTagEntry::OP_RESHAPING, "central", {"up_jes", "down_jes"})
         , _rnt(&_rlm), currentnode(0), _jetCorrector(0), _jetCorrectionUncertainty(0)
 {
         //
@@ -55,17 +49,17 @@ NanoAODAnalyzerrdframe::NanoAODAnalyzerrdframe(TTree *atree, std::string outfile
         }
         
         cout<<"Run "<<_year<<endl;
-        if(_year == "2016"){
-                _btagcalib = {"DeepJet", "data/DeepJet_2016LegacySF_V1.csv"};
+        if(_year == "2016preVFP"){
+                _btagcalib = {"DeepJet", "data/btag/DeepJet_2016LegacySF_V1.csv"};
         }
-        else if(_year == "2016CP5"){
-                _btagcalib = {"DeepJet", "data/DeepJet_2016LegacySF_V1_TuneCP5.csv"};
+        else if(_year == "2016postVFP"){
+                _btagcalib = {"DeepJet", "data/btag/DeepJet_2016LegacySF_V1_TuneCP5.csv"};
         }
         else if(_year == "2017"){
-                _btagcalib = {"DeepJet", "data/DeepFlavour_94XSF_V4_B_F.csv"};
+                _btagcalib = {"DeepJet", "data/btag/DeepJet_106XUL17SF_V2p1.csv"};
         }
         else if(_year == "2018"){
-                _btagcalib = {"DeepJet", "data/DeepJet_102XSF_V2.csv"};
+                _btagcalib = {"DeepJet", "data/btag/DeepJet_106XUL18SF.csv"};
         }
 
         // load the formulae b flavor tagging
@@ -73,27 +67,23 @@ NanoAODAnalyzerrdframe::NanoAODAnalyzerrdframe(TTree *atree, std::string outfile
         _btagcalibreader.load(_btagcalib, BTagEntry::FLAV_C, "iterativefit");
         _btagcalibreader.load(_btagcalib, BTagEntry::FLAV_UDSG, "iterativefit");
 
-        //_btagcalibreader2.load(_btagcalib2, BTagEntry::FLAV_B, "iterativefit");
-        //_btagcalibreader2.load(_btagcalib2, BTagEntry::FLAV_C, "iterativefit");
-        //_btagcalibreader2.load(_btagcalib2, BTagEntry::FLAV_UDSG, "iterativefit");
-
-        //
-        // pu weight setup
-        if(_year.find("2016") != std::string::npos){
-                cout<<"2016 pileup profile"<<endl;
-                pumcfile = "data/pileup_profile_Summer16.root";
-                pudatafile = "data/PileupData_GoldenJSON_Full2016.root";
+        if(_year.find("2016preVFP") != std::string::npos){
+                pumcfile = "data/pileup/PileupMC_UL16.root";
+                pudatafile = "data/pileup/PileupDATA_UL16pre.root";
+        }
+        else if(_year == "2016postVFP"){
+                pumcfile = "data/pileup/PileupMC_UL16.root";
+                pudatafile = "data/pileup/PileupDATA_UL16post.root";
         }
         else if(_year == "2017"){
-                cout<<"2017 pileup profile"<<endl;
-                pumcfile = "data/PileupMC2017v4.root";
-                pudatafile = "data/pileup_Cert_294927-306462_13TeV_PromptReco_Collisions17_withVar.root";
+                pumcfile = "data/pileup/PileupMC_UL17.root";
+                pudatafile = "data/pileup/PileupDATA_UL17.root";
         }
         else if(_year == "2018"){
-                cout<<"2018 pileup profile"<<endl;
-                pumcfile = "data/PileupMC2018.root";
-                pudatafile = "data/pileup_Cert_314472-325175_13TeV_17SeptEarlyReReco2018ABC_PromptEraD_Collisions18_JSON.root";
+                pumcfile = "data/pileup/PileupMC_UL18.root";
+                pudatafile = "data/pileup/PileupDATA_UL18.root";
         }
+        cout << "Loading Pileup profiles" << endl;
         TFile tfmc(pumcfile);
         _hpumc = dynamic_cast<TH1 *>(tfmc.Get("pu_mc"));
         _hpumc->SetDirectory(0);
@@ -109,6 +99,7 @@ NanoAODAnalyzerrdframe::NanoAODAnalyzerrdframe(TTree *atree, std::string outfile
         _hpudata_minus->SetDirectory(0);
         tfdata.Close();
 
+
         _puweightcalc = new WeightCalculatorFromHistogram(_hpumc, _hpudata);
         _puweightcalc_plus = new WeightCalculatorFromHistogram(_hpumc, _hpudata_plus);
         _puweightcalc_minus = new WeightCalculatorFromHistogram(_hpumc, _hpudata_minus);
@@ -123,136 +114,100 @@ NanoAODAnalyzerrdframe::NanoAODAnalyzerrdframe(TTree *atree, std::string outfile
         */
 
         // Loading Lepton Scale Factor
-        if(_year.find("2016") != std::string::npos){
-                
+                // Loading Muon Scale Factor
                 cout<<"Loading Muon SF"<<endl;
-                TFile MuonTrg2016BtoF("data/MuonSF/2016/EfficienciesAndSF_RunBtoF.root");
-                _hmuontrg2016BtoF = dynamic_cast<TH2F *>(MuonTrg2016BtoF.Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/pt_abseta_ratio"));
-                _hmuontrg2016BtoF->SetDirectory(0);
-                MuonTrg2016BtoF.Close();
+        if(_year.find("2016preVFP") != std::string::npos){
+                TFile muontrg("data/MuonSF/UL2016_preVFP/Efficiencies_muon_generalTracks_Z_Run2016_UL_HIPM_SingleMuonTriggers.root");
+                _hmuontrg = dynamic_cast<TH2F *>(muontrg.Get("NUM_IsoMu24_or_IsoTkMu24_DEN_CutBasedIdTight_and_PFIsoTight_abseta_pt"));
+                _hmuontrg->SetDirectory(0);
+                muontrg.Close();
 
-                TFile MuonTrg2016GtoH("data/MuonSF/2016/EfficienciesAndSF_RunGtoH.root");
-                _hmuontrg2016GtoH = dynamic_cast<TH2F *>(MuonTrg2016GtoH.Get("IsoMu24_OR_IsoTkMu24_PtEtaBins/pt_abseta_ratio"));
-                _hmuontrg2016GtoH->SetDirectory(0);
-                MuonTrg2016GtoH.Close();
-                
-                TFile MuonTightID2016BtoF("data/MuonSF/2016/RunBCDEF_SF_ID.root");
-                _hmuontightid2016BtoF = dynamic_cast<TH2D *>(MuonTightID2016BtoF.Get("NUM_TightID_DEN_genTracks_eta_pt"));
-                _hmuontightid2016BtoF->SetDirectory(0);
-                MuonTightID2016BtoF.Close();
+                TFile muonid("data/MuonSF/UL2016_preVFP/Efficiencies_muon_generalTracks_Z_Run2016_UL_HIPM_ID.root");
+                _hmuonid = dynamic_cast<TH2F *>(muonid.Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));
+                _hmuonid->SetDirectory(0);
+                muonid.Close();
 
-                TFile MuonTightID2016GtoH("data/MuonSF/2016/RunGH_SF_ID.root");
-                _hmuontightid2016GtoH = dynamic_cast<TH2D *>(MuonTightID2016GtoH.Get("NUM_TightID_DEN_genTracks_eta_pt"));
-                _hmuontightid2016GtoH->SetDirectory(0);
-                MuonTightID2016GtoH.Close();
-                
-                TFile MuonTightIso2016BtoF("data/MuonSF/2016/RunBCDEF_SF_ISO.root");
-                _hmuontightiso2016BtoF = dynamic_cast<TH2D *>(MuonTightIso2016BtoF.Get("NUM_TightRelIso_DEN_TightIDandIPCut_eta_pt"));
-                _hmuontightiso2016BtoF->SetDirectory(0);
-                MuonTightIso2016BtoF.Close();
+                TFile muoniso("data/MuonSF/UL2016_preVFP/Efficiencies_muon_generalTracks_Z_Run2016_UL_HIPM_ISO.root");
+                _hmuoniso = dynamic_cast<TH2F *>(muoniso.Get("NUM_TightRelTkIso_DEN_HighPtIDandIPCut_abseta_pt"));
+                _hmuoniso->SetDirectory(0);
+                muoniso.Close();
 
-                TFile MuonTightIso2016GtoH("data/MuonSF/2016/RunGH_SF_ISO.root");
-                _hmuontightiso2016GtoH = dynamic_cast<TH2D *>(MuonTightIso2016GtoH.Get("NUM_TightRelIso_DEN_TightIDandIPCut_eta_pt"));
-                _hmuontightiso2016GtoH->SetDirectory(0);
-                MuonTightIso2016GtoH.Close();
-
-                _muontrg2016BtoF = new WeightCalculatorFromHistogram(_hmuontrg2016BtoF);
-                _muontrg2016GtoH = new WeightCalculatorFromHistogram(_hmuontrg2016GtoH);
-                _muontightid2016BtoF = new WeightCalculatorFromHistogram(_hmuontightid2016BtoF);
-                _muontightid2016GtoH = new WeightCalculatorFromHistogram(_hmuontightid2016GtoH);
-                _muontightiso2016BtoF = new WeightCalculatorFromHistogram(_hmuontightiso2016BtoF);
-                _muontightiso2016GtoH = new WeightCalculatorFromHistogram(_hmuontightiso2016GtoH);
+                _muontrg = new WeightCalculatorFromHistogram(_hmuontrg);
+                _muonid = new WeightCalculatorFromHistogram(_hmuonid);
+                _muoniso = new WeightCalculatorFromHistogram(_hmuoniso);
 
         }
+        else if((_year == "2016postVFP")){
+                TFile muontrg("data/MuonSF/UL2016_postVFP/Efficiencies_muon_generalTracks_Z_Run2016_UL_SingleMuonTriggers.root");
+                _hmuontrg = dynamic_cast<TH2F *>(muontrg.Get("NUM_IsoMu24_or_IsoTkMu24_DEN_CutBasedIdTight_and_PFIsoTight_abseta_pt"));
+                _hmuontrg->SetDirectory(0);
+                muontrg.Close();
+
+                TFile muonid("data/MuonSF/UL2016_postVFP/Efficiencies_muon_generalTracks_Z_Run2016_UL_ID.root");
+                _hmuonid = dynamic_cast<TH2F *>(muonid.Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));
+                _hmuonid->SetDirectory(0);
+                muonid.Close();
+
+                TFile muoniso("data/MuonSF/UL2016_postVFP/Efficiencies_muon_generalTracks_Z_Run2016_UL_ISO.root");
+                _hmuoniso = dynamic_cast<TH2F *>(muoniso.Get("NUM_TightRelTkIso_DEN_HighPtIDandIPCut_abseta_pt"));
+                _hmuoniso->SetDirectory(0);
+                muoniso.Close();
+
+                _muontrg = new WeightCalculatorFromHistogram(_hmuontrg);
+                _muonid = new WeightCalculatorFromHistogram(_hmuonid);
+                _muoniso = new WeightCalculatorFromHistogram(_hmuoniso);
+        
+        }
         else if(_year == "2017"){
-                
-                cout<<"Loading Muon SF"<<endl;
-                TFile MuonTrg2017("data/MuonSF/2017/EfficienciesAndSF_RunBtoF_Nov17Nov2017.root");
-                _hmuontrg2017 = dynamic_cast<TH2F *>(MuonTrg2017.Get("IsoMu27_PtEtaBins/pt_abseta_ratio"));
-                _hmuontrg2017->SetDirectory(0);
-                MuonTrg2017.Close();
+                TFile muontrg("data/MuonSF/UL2017/Efficiencies_muon_generalTracks_Z_Run2017_UL_SingleMuonTriggers.root");
+                _hmuontrg = dynamic_cast<TH2F *>(muontrg.Get("NUM_IsoMu24_or_IsoTkMu24_DEN_CutBasedIdTight_and_PFIsoTight_abseta_pt"));
+                _hmuontrg->SetDirectory(0);
+                muontrg.Close();
 
-                // ID and ISO rootfiles are from https://twiki.cern.ch/twiki/bin/view/CMS/MuonReferenceEffs2017
-                TFile MuonTightID2017("data/MuonSF/2017/RunBCDEF_SF_ID.root");
-                _hmuontightid2017 = dynamic_cast<TH2D *>(MuonTightID2017.Get("NUM_TightID_DEN_genTracks_pt_abseta"));
-                _hmuontightid2017->SetDirectory(0);
-                MuonTightID2017.Close();
+                TFile muonid("data/MuonSF/UL2017/Efficiencies_muon_generalTracks_Z_Run2017_UL_ID.root");
+                _hmuonid = dynamic_cast<TH2F *>(muonid.Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));
+                _hmuonid->SetDirectory(0);
+                muonid.Close();
 
-                TFile MuonTightIso2017("data/MuonSF/2017/RunBCDEF_SF_ISO.root");         
-                _hmuontightiso2017 = dynamic_cast<TH2D *>(MuonTightIso2017.Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta"));
-                _hmuontightiso2017->SetDirectory(0);
-                MuonTightIso2017.Close();
+                TFile muoniso("data/MuonSF/UL2017/Efficiencies_muon_generalTracks_Z_Run2017_UL_ISO.root");
+                _hmuoniso = dynamic_cast<TH2F *>(muoniso.Get("NUM_TightRelTkIso_DEN_HighPtIDandIPCut_abseta_pt"));
+                _hmuoniso->SetDirectory(0);
+                muoniso.Close();
 
-                _muontrg2017 = new WeightCalculatorFromHistogram(_hmuontrg2017);
-                _muontightid2017 = new WeightCalculatorFromHistogram(_hmuontightid2017);
-                _muontightiso2017 = new WeightCalculatorFromHistogram(_hmuontightiso2017);
-
+                _muontrg = new WeightCalculatorFromHistogram(_hmuontrg);
+                _muonid = new WeightCalculatorFromHistogram(_hmuonid);
+                _muoniso = new WeightCalculatorFromHistogram(_hmuoniso);
+         
+                //cout<<"Loading Electron SF"<<endl;
                 //Electron Zvtx / prefiring 
         }
         else if(_year == "2018"){
                 
-                cout<<"Loading Muon SF"<<endl;
-                TFile MuonTrg2018before("data/MuonSF/2018/EfficienciesAndSF_2018Data_BeforeMuonHLTUpdate.root");
-                _hmuontrg2018before = dynamic_cast<TH2F *>(MuonTrg2018before.Get("IsoMu24_PtEtaBins/pt_abseta_ratio"));
-                _hmuontrg2018before->SetDirectory(0);
-                MuonTrg2018before.Close();
+                cout<<"Loading Muon SF 2018"<<endl;
 
-                TFile MuonTrg2018after("data/MuonSF/2018/EfficienciesAndSF_2018Data_AfterMuonHLTUpdate.root");
-                _hmuontrg2018after = dynamic_cast<TH2F *>(MuonTrg2018after.Get("IsoMu24_PtEtaBins/pt_abseta_ratio"));
-                _hmuontrg2018after->SetDirectory(0);
-                MuonTrg2018after.Close();
+                TFile muontrg("data/MuonSF/UL2018/Efficiencies_muon_generalTracks_Z_Run2018_UL_SingleMuonTriggers.root");
+                _hmuontrg = dynamic_cast<TH2F *>(muontrg.Get("NUM_IsoMu24_or_IsoTkMu24_DEN_CutBasedIdTight_and_PFIsoTight_abseta_pt"));
+                _hmuontrg = dynamic_cast<TH2F *>(muontrg.Get("NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_abseta_pt"));
+                _hmuontrg->SetDirectory(0);
+                muontrg.Close();
 
-                TFile MuonTightID2018("data/MuonSF/2018/RunABCD_SF_ID.root");
-                _hmuontightid2018 = dynamic_cast<TH2D *>(MuonTightID2018.Get("NUM_TightID_DEN_TrackerMuons_pt_abseta"));
-                _hmuontightid2018->SetDirectory(0);
-                MuonTightID2018.Close();
+                TFile muonid("data/MuonSF/UL2018/Efficiencies_muon_generalTracks_Z_Run2018_UL_ID.root");
+                _hmuonid = dynamic_cast<TH2F *>(muonid.Get("NUM_TightID_DEN_TrackerMuons_abseta_pt"));
+                _hmuonid->SetDirectory(0);
+                muonid.Close();
 
-                TFile MuonTightIso2018("data/MuonSF/2018/RunABCD_SF_ISO.root");         
-                _hmuontightiso2018 = dynamic_cast<TH2D *>(MuonTightIso2018.Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta"));
-                _hmuontightiso2018->SetDirectory(0);
-                MuonTightIso2018.Close();
+                TFile muoniso("data/MuonSF/UL2018/Efficiencies_muon_generalTracks_Z_Run2018_UL_ISO.root");
+                _hmuoniso = dynamic_cast<TH2F *>(muoniso.Get("NUM_TightRelTkIso_DEN_HighPtIDandIPCut_abseta_pt"));
+                _hmuoniso->SetDirectory(0);
+                muoniso.Close();
 
-                _muontrg2018before = new WeightCalculatorFromHistogram(_hmuontrg2018before);
-                _muontrg2018after = new WeightCalculatorFromHistogram(_hmuontrg2018after);
-                _muontightid2018 = new WeightCalculatorFromHistogram(_hmuontightid2018);
-                _muontightiso2018 = new WeightCalculatorFromHistogram(_hmuontightiso2018);
+                _muontrg = new WeightCalculatorFromHistogram(_hmuontrg);
+                _muonid = new WeightCalculatorFromHistogram(_hmuonid);
+                _muoniso = new WeightCalculatorFromHistogram(_hmuoniso);
 
                 //cout<<"Loading Electron SF"<<endl;
                 ////Electron -> Id/Reco/Zvtx/Trigger
 
-                ////Id
-                //TFile ElectronCutBasedTightID2018("data/ElectronSF/2018/egammaEffi.txt_EGM2D_updatedAll.root");
-                //_helectroncutBasedtightid2018 = dynamic_cast<TH2D *>(ElectronCutBasedTightID2018.Get("SOMETHING"));
-                //_helectroncutBasedtightid2018->SetDirectory(0);
-                //ElectronCutBasedTightID2018.Close();
-
-                ////Reco
-                //TFile ElectronReco2018("data/ElectronSF/2018/RunABCD_SF_ID.root");
-                //_helectronreco2018 = dynamic_cast<TH2D *>(ElectronReco2018.Get("NUM_Reco_DEN_TrackerElectrons_pt_abseta"));
-                //_helectronreco2018->SetDirectory(0);
-                //ElectronReco2018.Close();
-
-                ////2017 only //Zvtx
-                ////2017 only TFile ElectronHLTZvtx2018("data/ElectronSF/2018/RunABCD_SF_ISO.root");         
-                ////2017 only _helectronhltzvtx2018 = dynamic_cast<TH2D *>(ElectronHLTZvtx2018.Get("NUM_TightRelIso_DEN_TightIDandIPCut_pt_abseta"));
-                ////2017 only _helectronhltzvtx2018->SetDirectory(0);
-                ////2017 only ElectronHLTZvtx2018.Close();
-
-                ////Trigger
-                //TFile ElectronTrg2018before("data/ElectronSF/2018/egammaEffi.txt_EGM2D_updatedAll.root");
-                //_helectrontrg2018before = dynamic_cast<TH2F *>(ElectronTrg2018before.Get("IsoMu24_PtEtaBins/pt_abseta_ratio"));
-                //_helectrontrg2018before->SetDirectory(0);
-                //ElectronTrg2018before.Close();
-
-                //TFile ElectronTrg2018after("data/ElectronSF/2018/EfficienciesAndSF_2018Data_AfterElectronHLTUpdate.root");
-                //_helectrontrg2018after = dynamic_cast<TH2F *>(ElectronTrg2018after.Get("IsoMu24_PtEtaBins/pt_abseta_ratio"));
-                //_helectrontrg2018after->SetDirectory(0);
-                //ElectronTrg2018after.Close();
-
-                //_electrontrg2018before = new WeightCalculatorFromHistogram(_helectrontrg2018before);
-                //_electrontrg2018after = new WeightCalculatorFromHistogram(_helectrontrg2018after);
-                //_electrontightid2018 = new WeightCalculatorFromHistogram(_helectrontightid2018);
-                //_electrontightiso2018 = new WeightCalculatorFromHistogram(_helectrontightiso2018);
         }
 
 }
@@ -582,12 +537,12 @@ void NanoAODAnalyzerrdframe::selectLeptons()
                    .Define("lepton_m","is_mu ? Muon_mass[muoncuts][0] : Electron_mass[elecuts][0]");
 
         if(_year == "2018"){
-            _rlm = _rlm.Define("flags","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilterV2) ? true : false")
+            _rlm = _rlm.Define("flags","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter) ? true : false")
                        .Define("muTrigger","HLT_IsoMu24")
                        .Define("elTrigger","HLT_Ele32_WPTight_Gsf || HLT_Ele28_eta2p1_WPTight_Gsf_HT150");
         }
         if(_year == "2017"){
-            _rlm = _rlm.Define("flags","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilterV2) ? true : false")
+            _rlm = _rlm.Define("flags","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter) ? true : false")
                        .Define("flag_Trig",objectMatching,{"lepton_eta","lepton_phi","TrigObj_eta","TrigObj_phi","TrigObj_filterBits"})
                        .Define("muTrigger","HLT_IsoMu27")
                        .Define("elTrigger","(HLT_Ele32_WPTight_Gsf_L1DoubleEG && flag_Trig) || HLT_Ele28_eta2p1_WPTight_Gsf_HT150");
@@ -700,8 +655,79 @@ void NanoAODAnalyzerrdframe::applyJetMETCorrections()
 
 void NanoAODAnalyzerrdframe::selectGenJets(){
 
+        //is this genjet additional jet?
+        auto isaddJets = []( floats jeta, floats jphi, floats Wqeta, floats Wqphi, ints GenJet_nBHadFromT, ints GenJet_nBHadFromTbar, ints GenJet_nBHadFromW, ints GenJet_nBHadOther, ints GenJet_nCHadFromW, ints GenJet_nCHadOther ){
+        
+          bools out;
+          bool flag = false;
+        
+          //GenJet loops
+          for( size_t i = 0; i < jeta.size(); i++ ){
+            flag = false;
+        
+            //additional Jets
+            if( GenJet_nBHadFromTbar[i] + GenJet_nBHadFromT[i] + GenJet_nCHadFromW[i] < 1 ){
+              double minDRWquarks = DBL_MAX;
+        
+              for( size_t j = 0; j < Wqeta.size(); j++ ){
+                double dR = ROOT::VecOps::DeltaR(jeta[i], Wqeta[j], jphi[i], Wqphi[j]);
+                if( dR < minDRWquarks ) minDRWquarks = dR;
+              }
+              if( minDRWquarks > 0.4 ) flag = true;
+            }
+            //additional bJets
+            if( GenJet_nBHadOther[i] > 0 ) flag = true;
+            //additional cJets
+            if( GenJet_nCHadOther[i] > 0 ) flag = true;
+        
+            out.push_back(flag);
+          }
+        
+          return out;
+        };
+
+        auto isquarkfromW = [](FourVectorVec &p, ints &pdgId, ints &midx){
+        
+            bools out;
+            unsigned int np = p.size();
+            bool flag = false;
+        
+            // GenParticle loop 
+            for(unsigned int i = 0; i < np; i++){
+                flag = false;
+
+                //if the particle is quark {u d s c b}
+                if( abs( pdgId[i] ) < 6 ){
+
+                  //Is its mother W and Does it have top as its ancestor?
+                  int moid = midx[i];
+                  if ( abs( pdgId[ moid ] ) == 24 ){
+
+                      //Make sure W has two daugthers (W->qq)
+                      ints d_idx = find_element(midx, moid);
+                      if( d_idx.size() == 2 ){
+
+                          //lets find the mother of this W...
+                          for( unsigned int k = 0; k < np-2; k++){
+                              moid = midx[ moid ];
+                              if (moid > int(pdgId.size()) || moid < -1 ) break; //segement violation arises if the index is out of range
+
+                              //if this W has top as its ancestor 
+                              if( abs( pdgId[ moid ] ) == 6) {
+                                flag = true;
+                                break;
+                              }
+                          }
+                      }
+                  }
+                }
+                out.emplace_back(flag);
+            }
+            return out;
+        };
+
         //check genlepton is muon or electron and whether they're from top
-        auto isleptonfromtop = [](FourVectorVec &p, ints &pdgId, ints &midx, ints &status){
+        auto isleptonfromtop = [](FourVectorVec &p, ints &pdgId, ints &midx){
             bools out;
             unsigned int np = p.size();
             bool flag = false;
@@ -749,16 +775,11 @@ void NanoAODAnalyzerrdframe::selectGenJets(){
             return dr_lepjet;
         };
         
-        ////GenDressedLepton: Prompt leptons which have W boson as their parents
-        //_rlm = _rlm.Define("p4_GenJet",::gen4vec, {"GenJet_pt","GenJet_eta","GenJet_phi","GenJet_mass"})
-        //           .Define("p4_GenDressedLepton",::gen4vec, {"GenDressedLepton_pt","GenDressedLepton_eta","GenDressedLepton_phi","GenDressedLepton_mass"})
-        //           .Define("origin_gendR", dRlepton, {"p4_GenJet","p4_GenDressedLepton"});
-
         //genLepton removal with GenParticle collection: muon or electron that are from top 
         _rlm = _rlm.Define("p4_GenJet",::gen4vec, {"GenJet_pt","GenJet_eta","GenJet_phi","GenJet_mass"})
                    .Define("p4_GenPart",::gen4vec, {"GenPart_pt","GenPart_eta","GenPart_phi","GenPart_mass"});
       
-        _rlm = _rlm.Define("isleptonfromtop", isleptonfromtop, {"p4_GenPart","GenPart_pdgId","GenPart_genPartIdxMother","GenPart_statusFlags"})
+        _rlm = _rlm.Define("isleptonfromtop", isleptonfromtop, {"p4_GenPart","GenPart_pdgId","GenPart_genPartIdxMother"})
                    .Define("Genparts_pt","GenPart_pt[isleptonfromtop]")
                    .Define("Genparts_eta","GenPart_eta[isleptonfromtop]")
                    .Define("Genparts_phi","GenPart_phi[isleptonfromtop]")
@@ -766,9 +787,15 @@ void NanoAODAnalyzerrdframe::selectGenJets(){
                    .Define("p4_Genparts",::gen4vec, {"Genparts_pt","Genparts_eta","Genparts_phi","Genparts_mass"})
                    .Define("origin_gendR",dRlepton, {"p4_GenJet","p4_Genparts"});
 
-        _rlm = _rlm.Define("sel_addjets","origin_gendR > 0.4 && GenJet_pt > 20 && abs(GenJet_eta) < 2.4")
-                   .Define("sel_addbjets", "origin_gendR > 0.4 && (GenJet_nBHadFromT + GenJet_nBHadFromTbar + GenJet_nBHadFromW) == 0 && GenJet_nBHadOther > 0") //pt>20 && |eta|<2.4 selection is already applied in GenJet_n*Had*
-                   .Define("sel_addcjets", "origin_gendR > 0.4 && GenJet_nCHadFromW == 0 && GenJet_nCHadOther > 0"); //pt>20 && |eta|<2.4 selection is already applied in GenJet_n*Had*
+        //selection additional Jets
+        _rlm = _rlm.Define("quarksfromW",isquarkfromW,{"p4_GenPart","GenPart_pdgId","GenPart_genPartIdxMother"})
+                   .Define("quarksfromW_eta","GenPart_eta[quarksfromW]")
+                   .Define("quarksfromW_phi","GenPart_phi[quarksfromW]")
+                   .Define("isaddJet",isaddJets,{"GenJet_eta","GenJet_phi","quarksfromW_eta","quarksfromW_phi","GenJet_nBHadFromT","GenJet_nBHadFromTbar","GenJet_nBHadFromW","GenJet_nBHadOther","GenJet_nCHadFromW","GenJet_nCHadOther"});
+
+        _rlm = _rlm.Define("sel_addjets","origin_gendR > 0.4 && isaddJet && GenJet_pt > 20 && abs(GenJet_eta) < 2.4")
+                   .Define("sel_addbjets", "origin_gendR > 0.4 && (GenJet_nBHadFromT + GenJet_nBHadFromTbar + GenJet_nBHadFromW) == 0 && GenJet_nBHadOther > 0") //pt>20 && |eta|<2.4 selections are already applied in GenJet_n*Had*
+                   .Define("sel_addcjets", "origin_gendR > 0.4 && GenJet_nCHadFromW == 0 && GenJet_nCHadOther > 0"); //pt>20 && |eta|<2.4 selections are already applied in GenJet_n*Had*
 
         //for ttbb
         _rlm = _rlm.Define("addbjets_pt","GenJet_pt[sel_addbjets]") 
@@ -788,22 +815,17 @@ void NanoAODAnalyzerrdframe::selectGenJets(){
                    .Define("addbjet2_mass","addbjets_mass[1]");
 
         //for categorization
-        _rlm = _rlm.Define("NaddJets20", "Sum(sel_addjets)")  // >1:ttjj, else:ttother //should be replaced
+        _rlm = _rlm.Define("NaddJets20", "Sum(sel_addjets)")  // >1:ttjj
                    .Define("NaddbJets20","Sum(sel_addbjets)") // >1:ttbb, >0:ttbj
                    .Define("NaddcJets20","Sum(sel_addcjets)"); // >1:ttcc
 
-        //at the moment I dont have the method to discriminate the additional Jet...
-        //_rlm = _rlm.Define("isttjj","NaddJets20 > 1")
-        //           .Define("isttbb","isttjj && NaddbJets20 > 1")
-        //           .Define("isttbj","isttjj && !isttbb && NaddbJets20 > 0")
-        //           .Define("isttcc","isttjj && !isttbb && !isttbj && NaddcJets20 > 1")
-        //           .Define("isttLF","isttjj && !isttbb && !isttbj && !isttcc")
-        //           .Define("isttother","!isttjj");
-        _rlm = _rlm.Define("sel_pairGenJet","NaddJets20 > 1")
-                   .Define("isttbb","NaddbJets20 > 1")
-                   .Define("isttbj","!isttbb && NaddbJets20 > 0")
-                   .Define("isttcc","!isttbb && !isttbj && NaddcJets20 > 1")
-                   .Define("isttother","!isttbb && !isttbj && !isttcc");
+        //https://github.com/vallot/CATTools/blob/cat10x/CatAnalyzer/plugins/ttbbLepJetsAnalyzer.cc#L858-L866
+        _rlm = _rlm.Define("isttjj","NaddJets20 > 1")
+                   .Define("isttbb","isttjj && NaddbJets20 > 1")
+                   .Define("isttbj","!isttbb && isttjj && NaddbJets20 > 0")
+                   .Define("isttcc","!(isttbb || isttbj) && isttjj && NaddcJets20 > 1")
+                   .Define("isttLF","!(isttbb || isttbj || isttcc) && isttjj && NaddJets20 > 1")
+                   .Define("isttother","!(isttbb || isttbj || isttcc || isttLF)");
 
 }
 
@@ -893,159 +915,28 @@ void NanoAODAnalyzerrdframe::calculateEvWeight()
         if (!_isData && !isDefined("evWeight")) {
                 // Muon SF                
                 cout<<"Getting Muon Scale Factors"<<endl;
-                if(_year.find("2016") != std::string::npos){
-                        auto muon2016SF = [this](floats &pt, floats &eta)->float {
-                                float weight = 1;
-                                float w1 = 19.8; // Lumi for BtoF
-                                float w2 = 16.12; // Lumi for GtoH
-                                if(pt.size() > 0){
-                                        for(unsigned int i=0; i<pt.size(); i++){
-                                                float trgBtoF = _muontrg2016BtoF->getWeight(pt[i], std::abs(eta[i]));
-                                                float trgGtoH = _muontrg2016GtoH->getWeight(pt[i], std::abs(eta[i]));
-                                                float IDBtoF = _muontightid2016BtoF->getWeight(eta[i], pt[i]);
-                                                float IDGtoH = _muontightid2016GtoH->getWeight(eta[i], pt[i]);
-                                                float IsoBtoF = _muontightiso2016BtoF->getWeight(eta[i], pt[i]);
-                                                float IsoGtoH = _muontightiso2016GtoH->getWeight(eta[i], pt[i]);
+                auto muon2018SF = [this](floats &pt, floats &eta)->float {
+                        float weight = 1;
+                        if(pt.size() > 0){
+                                for(unsigned int i=0; i<pt.size(); i++){
+                                        float trg_SF = _muontrg->getWeight(std::abs(eta[i]),pt[i]);
+                                        float ID_SF = _muonid->getWeight(std::abs(eta[i]),pt[i]);
+                                        float Iso_SF = _muoniso->getWeight(std::abs(eta[i]),pt[i]);
+                                        weight *= trg_SF * ID_SF * Iso_SF;
+                                }
+                        }
+                        return weight;
+                };
 
-                                                float trg_avg_SF = (w1*trgBtoF + w2*trgGtoH) / (w1+w2);
-                                                float ID_avg_SF = (w1*IDBtoF + w2*IDGtoH) / (w1+w2);
-                                                float Iso_avg_SF = (w1*IsoBtoF + w2*IsoGtoH) / (w1+w2);
+                _rlm = _rlm.Define("evWeight_muonSF",muon2018SF,{"Sel_muonpt","Sel_muoneta"});
 
-                                                weight *= trg_avg_SF * ID_avg_SF * Iso_avg_SF;
-                                        }
-                                }
-                                return weight;
-                        };
-                        _rlm = _rlm.Define("evWeight_muonSF",muon2016SF,{"Sel_muonpt","Sel_muoneta"});
-                }
-                else if(_year == "2017"){
-                        auto muon2017SF = [this](floats &pt, floats &eta)->float {
-                                float weight = 1;
-                                if(pt.size() > 0){
-                                        for(unsigned int i=0; i<pt.size(); i++){
-                                                float trg_SF = _muontrg2017->getWeight(pt[i], std::abs(eta[i]));
-                                                float ID_SF = _muontightid2017->getWeight(pt[i], std::abs(eta[i]));
-                                                float Iso_SF = _muontightiso2017->getWeight(pt[i], std::abs(eta[i]));
-                                                weight *= trg_SF * ID_SF * Iso_SF;
-                                        }
-                                }
-                                return weight;
-                        };
-                        _rlm = _rlm.Define("evWeight_muonSF",muon2017SF,{"Sel_muonpt","Sel_muoneta"});
-                }
-                else if(_year == "2018"){
-                        auto muon2018SF = [this](floats &pt, floats &eta)->float {
-                                float weight = 1;
-                                float w1 = 8.95082; // Lumi for run < 316361
-                                float w2 = 50.78975; // Lumi for run >= 316361
-                                if(pt.size() > 0){
-                                        for(unsigned int i=0; i<pt.size(); i++){
-                                                float trg_before_SF = _muontrg2018before->getWeight(pt[i], std::abs(eta[i]));
-                                                float trg_after_SF = _muontrg2018after->getWeight(pt[i], std::abs(eta[i]));
-                                                float ID_SF = _muontightid2018->getWeight(pt[i], std::abs(eta[i]));
-                                                float Iso_SF = _muontightiso2018->getWeight(pt[i], std::abs(eta[i]));
-                                                
-                                                float trg_avg_SF = (w1*trg_before_SF + w2*trg_after_SF) / (w1+w2); // lumi-averaged trigger SF
-                                                weight *= trg_avg_SF * ID_SF * Iso_SF;
-                                        }
-                                }
-                                return weight;
-                        };
-                        _rlm = _rlm.Define("evWeight_muonSF",muon2018SF,{"Sel_muonpt","Sel_muoneta"});
-                }
+                // Electron SF                
+                //cout<<"Getting Electron Scale Factors"<<endl;
+                //_rlm = _rlm.Define("evWeight_eleSF",muon2018SF,{"Sel_elept","Sel_eleeta"});
 
                 //_rlm = _rlm.Define("evWeight_leptonSF","evWeight_muonSF*evWeight_eleSF"); //no eleSF sofar
                 _rlm = _rlm.Define("evWeight_leptonSF","evWeight_muonSF"); //no eleSF sofar
-                // Electron SF                
-                cout<<"Getting Electron Scale Factors"<<endl;
-                //if(_year.find("2016") != std::string::npos){
-                //        auto muon2016SF = [this](floats &pt, floats &eta)->float {
-                //                float weight = 1;
-                //                float w1 = 19.8; // Lumi for BtoF
-                //                float w2 = 16.12; // Lumi for GtoH
-                //                if(pt.size() > 0){
-                //                        for(unsigned int i=0; i<pt.size(); i++){
-                //                                float trgBtoF = _muontrg2016BtoF->getWeight(pt[i], std::abs(eta[i]));
-                //                                float trgGtoH = _muontrg2016GtoH->getWeight(pt[i], std::abs(eta[i]));
-                //                                float IDBtoF = _muontightid2016BtoF->getWeight(eta[i], pt[i]);
-                //                                float IDGtoH = _muontightid2016GtoH->getWeight(eta[i], pt[i]);
-                //                                float IsoBtoF = _muontightiso2016BtoF->getWeight(eta[i], pt[i]);
-                //                                float IsoGtoH = _muontightiso2016GtoH->getWeight(eta[i], pt[i]);
 
-                //                                float trg_avg_SF = (w1*trgBtoF + w2*trgGtoH) / (w1+w2);
-                //                                float ID_avg_SF = (w1*IDBtoF + w2*IDGtoH) / (w1+w2);
-                //                                float Iso_avg_SF = (w1*IsoBtoF + w2*IsoGtoH) / (w1+w2);
-
-                //                                weight *= trg_avg_SF * ID_avg_SF * Iso_avg_SF;
-                //                        }
-                //                }
-                //                return weight;
-                //        };
-                //        _rlm = _rlm.Define("evWeight_muonSF",muon2016SF,{"Sel_muonpt","Sel_muoneta"});
-                //}
-                //else if(_year == "2017"){
-                //        auto muon2017SF = [this](floats &pt, floats &eta)->float {
-                //                float weight = 1;
-                //                if(pt.size() > 0){
-                //                        for(unsigned int i=0; i<pt.size(); i++){
-                //                                float trg_SF = _muontrg2017->getWeight(pt[i], std::abs(eta[i]));
-                //                                float ID_SF = _muontightid2017->getWeight(pt[i], std::abs(eta[i]));
-                //                                float Iso_SF = _muontightiso2017->getWeight(pt[i], std::abs(eta[i]));
-                //                                weight *= trg_SF * ID_SF * Iso_SF;
-                //                        }
-                //                }
-                //                return weight;
-                //        };
-                //        _rlm = _rlm.Define("evWeight_muonSF",muon2017SF,{"Sel_muonpt","Sel_muoneta"});
-                //}
-                //if(_year == "2018"){
-                //        //auto muon2018SF = [this](float pt, float eta, int channel)-> vector<float> {
-                //        vector<float> muon2018SF = [](float pt, float eta, int channel){
-                //                vector<float> weight;
-                //                float w1 = 8.95082; // Lumi for run < 316361
-                //                float w2 = 50.78975; // Lumi for run >= 316361
-                //                cout << "here1" << endl;
-                //                if( channel == 0 ){
-                //                        
-                //                        //for(unsigned int i=0; i<pt.size(); i++){
-                //                        //        float trg_before_SF = _muontrg2018before->getWeight(pt[i], std::abs(eta[i]));
-                //                        //        float trg_after_SF = _muontrg2018after->getWeight(pt[i], std::abs(eta[i]));
-                //                        //        float ID_SF = _muontightid2018->getWeight(pt[i], std::abs(eta[i]));
-                //                        //        float Iso_SF = _muontightiso2018->getWeight(pt[i], std::abs(eta[i]));
-                //                        //        
-                //                        //        float trg_avg_SF = (w1*trg_before_SF + w2*trg_after_SF) / (w1+w2); // lumi-averaged trigger SF
-                //                        //        weight *= trg_avg_SF * ID_SF * Iso_SF;
-                //                        //}
-
-                //                        float trg_before_SF = _muontrg2018before->getWeight(pt, std::abs(eta));
-                //                        float trg_after_SF = _muontrg2018after->getWeight(pt, std::abs(eta));
-                //                        float ID_SF = _muontightid2018->getWeight(pt, std::abs(eta));
-                //                        float Iso_SF = _muontightiso2018->getWeight(pt, std::abs(eta));
-                //                        
-                //                        float trg_avg_SF = (w1*trg_before_SF + w2*trg_after_SF) / (w1+w2); // lumi-averaged trigger SF
-                //                        //weight *= trg_avg_SF * ID_SF * Iso_SF;
-                //                        weight.push_back(ID_SF); // [0]-> IdSF 
-                //                        weight.push_back(ID_SF); // [1]-> IdSF+Error
-                //                        weight.push_back(ID_SF); // [2]-> IdSF-Error
-                //                        weight.push_back(Iso_SF); // [3]-> IsoSF
-                //                        weight.push_back(Iso_SF); // [4]-> IsoSF+Error
-                //                        weight.push_back(Iso_SF); // [5]-> IsoSF-Error
-                //                        weight.push_back(trg_avg_SF); // [6]-> TrgSF
-                //                        weight.push_back(trg_avg_SF); // [7]-> TrgSF+Error
-                //                        weight.push_back(trg_avg_SF); // [8]-> TrgSF-Error
-                //                        weight.push_back(ID_SF*Iso_SF*trg_avg_SF); // [9] nominal All
-                //                }
-                //                cout << "here2" << endl;
-                //                return weight;
-                //                cout << "here3" << endl;
-                //        };
-                //        //_rlm = _rlm.Define("evWeight_muonSF",muon2018SF,{"Sel_muonpt","Sel_muoneta"});
-                //        _rlm = _rlm.Define("evWeight_muonSF",muon2018SF,{"lepton_pt","lepton_eta","channel"}); //tmp name for muon
-                //}
-
-                //_rlm = _rlm.Define("evWeight_leptonSF","evWeight_muonSF[9]");
-                //_rlm = _rlm.Define("lepton_SF","evWeight_muonSF");
-                
                 // B tagging SF
                 // calculate event weight for MC only
                 _rlm = _rlm.Define("Sel_jethadflav","Jet_hadronFlavour[jetcuts]")
