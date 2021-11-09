@@ -56,6 +56,11 @@ if __name__ == '__main__':
                       default=False,
                       help='Submission command')
 
+    parser.add_option("-c", "--cat", dest="cat",
+                      action = 'store_true',
+                      default=False,
+                      help='Categorization command')
+
     parser.add_option("-m", "--merge", dest="merge",
                       action = 'store_true',
                       default=False,
@@ -90,10 +95,15 @@ if __name__ == '__main__':
           if '18' in yearname:
             year = "2018"    
 
-          logfilename = dirnames[7] + '_' + dirnames[6] + '.txt'
-          cmd = './skimnanoaod.py -F --split 25 -Y ' + year + ' ' + line + ' ' + fpath + '/' + dirnames[7] +  '/' + dirnames[6] + ' > ' + logfilename 
-          print cmd
-          #os.system(cmd)
+          logfilename = dirnames[6] + '_' + dirnames[7] 
+          if options.cat:
+            cat_process = args[2]
+            logfilename = logfilename+"_"+cat_process 
+            cmd = './skimnanoaod.py -F --split 25 -Y ' + year + ' -C ' + cat_process +' '  + line + ' ' + fpath + '/' + dirnames[6] +  '/' + dirnames[7] + "_" + cat_process + ' > ' + logfilename + ".txt"
+          else:
+            cmd = './skimnanoaod.py -F --split 25 -Y ' + year + ' ' + line + ' ' + fpath + '/' + dirnames[6] +  '/' + dirnames[7] + ' > ' + logfilename + ".txt" 
+          #print cmd
+          os.system(cmd)
     if options.merge:
         print ("merge")
         merge( fpath ) 

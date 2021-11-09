@@ -310,3 +310,11 @@ floats sort_discriminant( floats discr, floats obj ){
         }
         return out;
 }
+
+ints find_element( ints vec, int a ){
+        ints out;
+        for(unsigned int i = 0; i < vec.size(); i++){
+            if( vec[i] == a ) out.emplace_back(i);
+        }
+        return out;
+}
