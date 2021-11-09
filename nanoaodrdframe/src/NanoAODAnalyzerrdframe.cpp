@@ -850,8 +850,8 @@ void NanoAODAnalyzerrdframe::selectJets()
                    .Define("Sel_jetphi", "Jet_phi[jetcuts]")
                    .Define("Sel_jetmass", "Jet_mass[jetcuts]")
                    .Define("Sel_jetbtag", "Jet_btagDeepFlavB[jetcuts]")
-                   .Define("Sel_jetcvsb", "Jet_btagDeepFlavC[jetcuts]/(Jet_btagDeepFlavC[jetcuts]+Jet_btagDeepFlavB[jetcuts])")
-                   .Define("Sel_jetcvsl", "Jet_btagDeepFlavC[jetcuts]/(1- Jet_btagDeepFlavB[jetcuts])")
+                   .Define("Sel_jetcvsb", "Jet_btagDeepFlavCvB[jetcuts]")
+                   .Define("Sel_jetcvsl", "Jet_btagDeepFlavCvL[jetcuts]")
                    .Define("njetspass", "int(Sel_jetpt.size())")
                    .Define("jet4vecs", ::gen4vec, {"Sel_jetpt", "Sel_jeteta", "Sel_jetphi", "Sel_jetmass"});
 
