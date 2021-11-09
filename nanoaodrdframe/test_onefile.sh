@@ -1,0 +1,2 @@
+#./skimonefile.py -Y 2016 /data1/common/NanoAOD/v8_UL/mc/RunIISummer20UL16NanoAODAPVv2/WJetsToLNu_HT-600To800_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_mcRun2_asymptotic_preVFP_v9-v1/30000/0614B190-ADCF-9F42-B18A-509EB7884901.root out.root Events outputTree 
+./skimonefile.py -Y 2018 -C ttbb /data1/users/tjkim/topNanoAOD/v9-1-1/2018UL/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/TopNanoAODv9-1-1_2018UL/211021_090852/0000/tree_1.root out.root Events outputTree 
