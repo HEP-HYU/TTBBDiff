@@ -49,10 +49,7 @@ NanoAODAnalyzerrdframe::NanoAODAnalyzerrdframe(TTree *atree, std::string outfile
         }
         
         cout<<"Run "<<_year<<endl;
-        if(_year == "2016preVFP"){
-                _btagcalib = {"DeepJet", "data/btag/DeepJet_2016LegacySF_V1.csv"};
-        }
-        else if(_year == "2016postVFP"){
+        if(_year.find("2016") != std::string::npos){
                 _btagcalib = {"DeepJet", "data/btag/DeepJet_2016LegacySF_V1_TuneCP5.csv"};
         }
         else if(_year == "2017"){
@@ -67,7 +64,7 @@ NanoAODAnalyzerrdframe::NanoAODAnalyzerrdframe(TTree *atree, std::string outfile
         _btagcalibreader.load(_btagcalib, BTagEntry::FLAV_C, "iterativefit");
         _btagcalibreader.load(_btagcalib, BTagEntry::FLAV_UDSG, "iterativefit");
 
-        if(_year.find("2016preVFP") != std::string::npos){
+        if(_year == "2016preVFP"){
                 pumcfile = "data/pileup/PileupMC_UL16.root";
                 pudatafile = "data/pileup/PileupDATA_UL16pre.root";
         }
@@ -114,9 +111,9 @@ NanoAODAnalyzerrdframe::NanoAODAnalyzerrdframe(TTree *atree, std::string outfile
         */
 
         // Loading Lepton Scale Factor
-                // Loading Muon Scale Factor
-                cout<<"Loading Muon SF"<<endl;
-        if(_year.find("2016preVFP") != std::string::npos){
+        // Loading Muon Scale Factor
+        cout<<"Loading Muon SF"<<endl;
+        if(_year == "2016preVFP"){
                 TFile muontrg("data/MuonSF/UL2016_preVFP/Efficiencies_muon_generalTracks_Z_Run2016_UL_HIPM_SingleMuonTriggers.root");
                 _hmuontrg = dynamic_cast<TH2F *>(muontrg.Get("NUM_IsoMu24_or_IsoTkMu24_DEN_CutBasedIdTight_and_PFIsoTight_abseta_pt"));
                 _hmuontrg->SetDirectory(0);
@@ -160,7 +157,7 @@ NanoAODAnalyzerrdframe::NanoAODAnalyzerrdframe(TTree *atree, std::string outfile
         }
         else if(_year == "2017"){
                 TFile muontrg("data/MuonSF/UL2017/Efficiencies_muon_generalTracks_Z_Run2017_UL_SingleMuonTriggers.root");
-                _hmuontrg = dynamic_cast<TH2F *>(muontrg.Get("NUM_IsoMu24_or_IsoTkMu24_DEN_CutBasedIdTight_and_PFIsoTight_abseta_pt"));
+                _hmuontrg = dynamic_cast<TH2F *>(muontrg.Get("NUM_IsoMu27_DEN_CutBasedIdTight_and_PFIsoTight_abseta_pt"));
                 _hmuontrg->SetDirectory(0);
                 muontrg.Close();
 
@@ -186,7 +183,6 @@ NanoAODAnalyzerrdframe::NanoAODAnalyzerrdframe(TTree *atree, std::string outfile
                 cout<<"Loading Muon SF 2018"<<endl;
 
                 TFile muontrg("data/MuonSF/UL2018/Efficiencies_muon_generalTracks_Z_Run2018_UL_SingleMuonTriggers.root");
-                _hmuontrg = dynamic_cast<TH2F *>(muontrg.Get("NUM_IsoMu24_or_IsoTkMu24_DEN_CutBasedIdTight_and_PFIsoTight_abseta_pt"));
                 _hmuontrg = dynamic_cast<TH2F *>(muontrg.Get("NUM_IsoMu24_DEN_CutBasedIdTight_and_PFIsoTight_abseta_pt"));
                 _hmuontrg->SetDirectory(0);
                 muontrg.Close();
@@ -473,7 +469,7 @@ void NanoAODAnalyzerrdframe::selectElectrons()
         // Run II recomendation - cutbased: https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
 
         if(_year == "2018" || _year == "2017") _rlm = _rlm.Define("elKinematics","( Electron_pt > 34.0 && abs(Electron_eta) < 2.4 ) || ( Electron_pt > 30.0 && abs(Electron_eta) < 2.1 )");
-        if(_year == "2016") _rlm = _rlm.Define("elKinematics","Electron_pt > 29.0 && abs(Electron_eta) < 2.4");
+        if(_year.find("2016") != std::string::npos) _rlm = _rlm.Define("elKinematics","Electron_pt > 29.0 && abs(Electron_eta) < 2.4");
 
         _rlm = _rlm.Define("elecuts", "elKinematics && ( ( abs(Electron_eta + Electron_deltaEtaSC) < 1.4442 ) || abs(Electron_eta + Electron_deltaEtaSC) > 1.566 ) && ( ( (abs(Electron_eta + Electron_deltaEtaSC) <= 1.479) && abs(Electron_dxy) < 0.05 && abs(Electron_dz) < 0.10 ) || ( (abs(Electron_eta + Electron_deltaEtaSC)>1.479) && abs(Electron_dxy) < 0.10 && abs(Electron_dz) < 0.20) ) && Electron_cutBased == 4");
         _rlm = _rlm.Define("vetoelecuts", "Electron_pt > 15.0 && abs(Electron_eta) < 2.5 && Electron_cutBased >= 1"); 
@@ -492,7 +488,7 @@ void NanoAODAnalyzerrdframe::selectElectrons()
 void NanoAODAnalyzerrdframe::selectMuons()
 {
         cout << "select muons" << endl;
-        if(_year == "2018" || _year == "2016") _rlm = _rlm.Define("muKinematics","Muon_pt > 26.0 && abs(Muon_eta) < 2.4");
+        if(_year == "2018" || _year.find("2016") != std::string::npos) _rlm = _rlm.Define("muKinematics","Muon_pt > 26.0 && abs(Muon_eta) < 2.4");
         if(_year == "2017") _rlm = _rlm.Define("muKinematics","Muon_pt > 29.0 && abs(Muon_eta) < 2.4");
 
         _rlm = _rlm.Define("muoncuts", "muKinematics && Muon_tightId && Muon_pfRelIso04_all<0.15");
@@ -547,7 +543,7 @@ void NanoAODAnalyzerrdframe::selectLeptons()
                        .Define("muTrigger","HLT_IsoMu27")
                        .Define("elTrigger","(HLT_Ele32_WPTight_Gsf_L1DoubleEG && flag_Trig) || HLT_Ele28_eta2p1_WPTight_Gsf_HT150");
         }
-        if(_year == "2016"){
+        if(_year.find("2016") != std::string::npos){
             _rlm = _rlm.Define("flags","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter) ? true : false")
                        .Define("muTrigger","HLT_IsoMu24 || HLT_IsoTkMu24")
                        .Define("elTrigger","HLT_Ele27_WPTight_Gsf");
@@ -871,7 +867,7 @@ void NanoAODAnalyzerrdframe::selectJets()
         //https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation102X
         if(_year == "2018") _rlm = _rlm.Define("wp","0.2770");
         if(_year == "2017") _rlm = _rlm.Define("wp","0.3033");
-        if(_year == "2016") _rlm = _rlm.Define("wp","0.3093");
+        if(_year.find("2016") != std::string::npos) _rlm = _rlm.Define("wp","0.3093");
 
         _rlm = _rlm.Define("btagcuts", "jet_deepJet>wp")
                    .Define("bjet_pt", "jet_pt[btagcuts]")
