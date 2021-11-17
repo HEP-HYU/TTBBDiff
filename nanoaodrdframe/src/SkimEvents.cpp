@@ -93,7 +93,6 @@ void SkimEvents::defineCuts()
 
 void SkimEvents::defineMoreVars()
 {
-	//addVar({"Sel_jetHT", "Sum(Sel_jetpt)"});
 
   //only for ttSL skimming
 	//addVartoStore("run");
@@ -145,25 +144,9 @@ void SkimEvents::defineMoreVars()
   addVartoStore("lepton_.*");
   addVartoStore("jet_.*");
   addVartoStore("bjet_.*");
-
-  //of course
 	addVartoStore("MET.*");
 	//addVartoStore("LHE_.*"); // WJet HT sample
-
-  //should I?
-	//addVartoStore("PV.*");
-	//addVartoStore("nOtherPV");
-	//addVartoStore("OtherPV_z");
-	//addVartoStore("flags");
-  //for MET Filter
-	addVartoStore("Flag_goodVertices");
-	addVartoStore("Flag_globalSuperTightHalo2016Filter");
-	addVartoStore("Flag_HBHENoiseFilter");
-	addVartoStore("Flag_HBHENoiseIsoFilter");
-	addVartoStore("Flag_EcalDeadCellTriggerPrimitiveFilter");
-	addVartoStore("Flag_BadPFMuonFilter");
-	addVartoStore("Flag_eeBadScFilter");
-	if(_year == "2017" || _year == "2018") addVartoStore("Flag_ecalBadCalibFilter"); //MET Filter condition - NanoAODv6: Flag_ecalBadCalibFilterV2 -> UL: Flag_ecalBadCalibFilter
+	addVartoStore("flags");
 
   //for ttbb
   if(_cat == "ttbb"){
