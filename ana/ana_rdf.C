@@ -9,8 +9,6 @@
 #include "TLegend.h"
 #include "Math/Vector4Dfwd.h"
 #include <vector>
-//#include "xsection.h"
-//#include "selection.h"
 
 using namespace ROOT::VecOps;
 using rvec_f = RVec<float>;
@@ -666,19 +664,7 @@ void plot(T sig, const std::string &name, const std::string &filename){
 
 void ana_rdf(TString year = "2018", TString name = "test_ttbb", TString ch = "0", TString dnn = "1"){
 
-  //ROOT::RDataFrame df("outputTree",Form("/data1/common/skimmed_NanoAOD/ttbb_ntuplev2/%s/%s/*.root", year.Data(), name.Data()) ); //from local
-  ROOT::RDataFrame df("outputTree",Form("/data1/users/tjkim/ttbb/v0/%s/%s/*.root", year.Data(), name.Data()) ); //from local
-
-/*
-  TFile *f_info = new TFile(Form("/cms/ldap_home/sarakm0704/public/ttbb/%s/sync/%s.root", name.Data()));
-  TH1D * EventInfo = (TH1D*) f_info->Get("ttbbLepJets/EventInfo");
-  double n = EventInfo->GetBinContent(2);
-  double Xsection = 1.0;
-
-  if(  Xsections.find(name.Data()) != Xsections.end() ){
-    Xsection = Xsections.find(name)->second ;
-  } 
-*/
+  ROOT::RDataFrame df("outputTree",Form("/data1/common/skimmed_NanoAOD/ttbb_ntuple_ULv2/%s/%s/*.root", year.Data(), name.Data()) ); //from local
 
   auto df_ch = df.Filter(Form("channel == %s", ch.Data()),"lepton channel");
 
@@ -694,7 +680,7 @@ void ana_rdf(TString year = "2018", TString name = "test_ttbb", TString ch = "0"
     df_ch = df_ch.Define("weight","evWeight/btagWeight_DeepFlavBrecalc");
     df_ch = df_ch.Define("b_weight","evWeight");
 
-    //MC
+    //MC TODO
     //df_ch = df_ch.Define("jet_scale","jet_JER_Nom");
     ////event weight = genweight * puweight * lepton SF * b-tagging SF
     //if ( ch.Atoi() == 0 ){
@@ -730,20 +716,17 @@ void ana_rdf(TString year = "2018", TString name = "test_ttbb", TString ch = "0"
   if( year.Contains("2016")){
       if (ch.Atoi() == 0) df_S0 = df_S0.Filter("lepton_pt > 26 && abs(lepton_eta) < 2.4");
       else if (ch.Atoi() == 1) df_S0 = df_S0.Filter("lepton_pt > 29 && abs(lepton_eta) < 2.4");
-      df_S0 = df_S0.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.3093f);")
-                   .Define("flag","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter) ? true : false");
+      df_S0 = df_S0.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.3093f);");
 
   }else if (year.Contains("2017")){ 
       if (ch.Atoi() == 0) df_S0 = df_S0.Filter("lepton_pt > 29 && abs(lepton_eta) < 2.4");
       else if (ch.Atoi() == 1) df_S0 = df_S0.Filter("(lepton_pt > 34 && abs(lepton_eta) < 2.4) || (lepton_pt > 30 && abs(lepton_eta) < 2.1)");
-      df_S0 = df_S0.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.3033f);")
-                   .Define("flag","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter) ? true : false");
+      df_S0 = df_S0.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.3033f);");
 
   }else if (year.Contains("2018")){ 
       if (ch.Atoi() == 0) df_S0 = df_S0.Filter("lepton_pt > 26 && abs(lepton_eta) < 2.4");
       else if (ch.Atoi() == 1) df_S0 = df_S0.Filter("(lepton_pt > 34 && abs(lepton_eta) < 2.4) || (lepton_pt > 30 && abs(lepton_eta) < 2.1)");
-      df_S0 = df_S0.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.2770f);")
-                   .Define("flag","(Flag_goodVertices && Flag_globalSuperTightHalo2016Filter && Flag_HBHENoiseFilter && Flag_HBHENoiseIsoFilter && Flag_EcalDeadCellTriggerPrimitiveFilter && Flag_BadPFMuonFilter && Flag_eeBadScFilter && Flag_ecalBadCalibFilter) ? true : false");
+      df_S0 = df_S0.Define("BTAG_deepJet_M","rvec_f(jet_pt.size(), 0.2770f);");
   }
 
   df_S0 = df_S0.Define("njets","Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 )");
@@ -755,7 +738,7 @@ void ana_rdf(TString year = "2018", TString name = "test_ttbb", TString ch = "0"
 
   //step1
   // 1 lep 1 jet
-  auto df_S1 = df_S0.Filter("flag && Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 ) >= 1", "Events with one lepton and one jet");
+  auto df_S1 = df_S0.Filter("flags && Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 ) >= 1", "Events with one lepton and one jet");
 //               .Define("njets","Sum( jet_pt*jet_scale > 30 && abs(jet_eta) < 2.4 )");
   
   auto h_njets_S1 = df_S1.Histo1D({"h_njets_S1", "", 10, 0, 10}, "njets","weight");
@@ -828,8 +811,6 @@ void ana_rdf(TString year = "2018", TString name = "test_ttbb", TString ch = "0"
   auto h_bjet1_pt_S4 = df_S4.Define("bjet1_pT","jet_pt[bjet_idx[0]]*jet_scale[bjet_idx[0]]").Histo1D({"h_bjet1_pt_S4","",20,0,400},"bjet1_pT","b_weight");
   auto h_bjet2_pt_S4 = df_S4.Define("bjet2_pT","jet_pt[bjet_idx[1]]*jet_scale[bjet_idx[1]]").Histo1D({"h_bjet2_pt_S4","",20,0,400},"bjet2_pT","b_weight");
 
-//instant number?
-//  df_var = df_S3.Define("number","rvec_f(jet_pt.size(), 1.0f);").Define("test1", compute_var, {"jet_combi_idx","jet_pt","jet_eta","jet_phi","jet_scale","jet_deepJet","number"});
   //for DNN
   if( dnn.Atoi() == true ){
       df_S4 = df_S4.Define("jet_combi_idx", jet_combi, {"jet_pt","jet_eta","jet_phi","jet_m","jet_scale","jet_deepJet","BTAG_deepJet_M"})
