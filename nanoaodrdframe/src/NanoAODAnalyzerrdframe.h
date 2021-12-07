@@ -121,10 +121,10 @@ private:
         // pile up weights
         const char * pumcfile;
         const char * pudatafile;
-        TH1 *_hpumc;
-        TH1 *_hpudata;
-        TH1 *_hpudata_plus;
-        TH1 *_hpudata_minus;
+        TH1D *_hpumc;
+        TH1D *_hpudata;
+        TH1D *_hpudata_plus;
+        TH1D *_hpudata_minus;
         WeightCalculatorFromHistogram *_puweightcalc;
         WeightCalculatorFromHistogram *_puweightcalc_plus;
         WeightCalculatorFromHistogram *_puweightcalc_minus;

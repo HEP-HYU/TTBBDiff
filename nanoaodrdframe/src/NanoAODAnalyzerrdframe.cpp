@@ -82,14 +82,14 @@ NanoAODAnalyzerrdframe::NanoAODAnalyzerrdframe(TTree *atree, std::string outfile
         }
         cout << "Loading Pileup profiles" << endl;
         TFile tfmc(pumcfile);
-        _hpumc = dynamic_cast<TH1 *>(tfmc.Get("pu_mc"));
+        _hpumc = dynamic_cast<TH1D *>(tfmc.Get("pu_mc"));
         _hpumc->SetDirectory(0);
         tfmc.Close();
 
         TFile tfdata(pudatafile);
-        _hpudata = dynamic_cast<TH1 *>(tfdata.Get("pileup"));
-        _hpudata_plus = dynamic_cast<TH1 *>(tfdata.Get("pileup_plus"));
-        _hpudata_minus = dynamic_cast<TH1 *>(tfdata.Get("pileup_minus"));
+        _hpudata = dynamic_cast<TH1D *>(tfdata.Get("pileup"));
+        _hpudata_plus = dynamic_cast<TH1D *>(tfdata.Get("pileup_plus"));
+        _hpudata_minus = dynamic_cast<TH1D *>(tfdata.Get("pileup_minus"));
 
         _hpudata->SetDirectory(0);
         _hpudata_plus->SetDirectory(0);
